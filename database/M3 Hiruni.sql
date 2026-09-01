@@ -1,0 +1,25 @@
+USE bus_fleet_management_001;
+
+CREATE TABLE Journey(
+JourneyID INT PRIMARY KEY,
+JDate DATE NOT NULL,
+JBusNo VARCHAR(10) NOT NULL,
+JDriver VARCHAR(5) NOT NULL,
+JPurpose VARCHAR(20) NOT NULL,
+Jclient VARCHAR(10) ,
+JDeparture VARCHAR(50),
+JDestination VARCHAR(50),
+JStartOdo INT NOT NULL,
+JEndOdo INT NOT NULL,
+JKMTravelled  INT GENERATED ALWAYS AS (JEndOdo - JStartOdo) STORED,
+JIncomeAmount DECIMAL(10,2) NOT NULL,
+JNotes VARCHAR(100),
+CONSTRAINT ST1 CHECK( JStartOdo > 0),
+CONSTRAINT ST2 CHECK( JEndOdo > 0),
+CONSTRAINT ST3 CHECK( JEndOdo > JStartOdo ),
+CONSTRAINT ST4 CHECK( JPurpose IN('Staff Transport', 'Tour', 'Hire', 'Other'))
+);
+
+DESCRIBE Journey;
+
+DROP TABLE Journey;
