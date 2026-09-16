@@ -8,4 +8,10 @@ BNotes VARCHAR(225),
 BActive BOOLEAN DEFAULT TRUE
 );
 
+-- Adding the Capacity column to the Bus table
+ALTER TABLE Bus ADD COLUMN BCapacity INT AFTER BPurchasePrice;
 
+SELECT *FROM Bus;
+
+/* The Final Table 
+BRegistrationNo | BPurchaseDate | BPurchasePrice | BCapacity | BNotes | BActive */
