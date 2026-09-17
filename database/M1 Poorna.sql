@@ -3,10 +3,10 @@ USE bus_fleet_management_001;
 -- Creating the Bus Table
 CREATE TABLE Bus(
 BRegistrationNo VARCHAR(20) PRIMARY KEY,
-BPurchaseDate DATE,
-BPurchasePrice DECIMAL(10,2),
+BPurchaseDate DATE NOT NULL,
+BPurchasePrice DECIMAL(10,2) NOT NULL,
 BNotes VARCHAR(225),
-BActive BOOLEAN DEFAULT TRUE
+BActive BOOLEAN DEFAULT TRUE NOT NULL
 );
 
 -- Adding the Capacity column to the Bus table
@@ -19,13 +19,15 @@ BRegistrationNo | BPurchaseDate | BPurchasePrice | BCapacity | BNotes | BActive 
 
 -- Creating the FuelLog Table
 CREATE TABLE FuelLog(
-FDate DATE,
-FPrice DECIMAL(10,2),
-FCost DECIMAL(10,2),
-FLitersfilled DECIMAL(10,2)
+FDate DATE NOT NULL,
+FPrice DECIMAL(10,2) NOT NULL,
+FCost DECIMAL(10,2) NOT NULL,
+FLitersfilled DECIMAL(10,2) GENERATED ALWAYS AS(FCost/FPrice) STORED
 );
 
 SELECT *FROM Bus;
 
 /* The Final Table
 FDate | FFuelPrice | FCost | FLitersFilled */
+
+
