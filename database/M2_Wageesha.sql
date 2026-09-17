@@ -10,3 +10,14 @@ CREATE TABLE Driver (
     notes VARCHAR(500)
 );
 SELECT * FROM Driver;
+
+CREATE TABLE Driver_Salary (
+    CurrentYear int NOT NULL,
+    CurrentMonth int NOT NULL,
+    TripsCompleted int,
+    BaseSalary DECIMAL(10, 2),
+    PerTripAllowance DECIMAL(10, 2),
+    MonthlySalary DECIMAL(10,2),
+	CONSTRAINT fkDriverID FOREIGN KEY (DriverID) REFERENCES Driver(DriverID ) ON DELETE CASCADE ON UPDATE CASCADE
+);
+SELECT * FROM Driver_Salary;
