@@ -20,6 +20,20 @@ CONSTRAINT ST3 CHECK( JEndOdo > JStartOdo ),
 CONSTRAINT ST4 CHECK( JPurpose IN('Staff Transport', 'Tour', 'Hire', 'Other'))
 );
 
+CREATE TABLE Expence(
+Edate DATE NOT NULL,
+EbusRegNo VARCHAR(20) NOT NULL,
+ECategory VARCHAR(20) NOT NULL,
+EPaymentMethod VARCHAR(20) NOT NULL,
+EAmount DECIMAL(10,2),
+EDescription VARCHAR(50),
+CONSTRAINT ET1 CHECK(EAmount > 0),
+CONSTRAINT ET2 CHECK( ECategory IN ('Insurance', 'Tires', 'Spare Parts', 'Other Staff Wages', 'Other')),
+CONSTRAINT ET3 CHECK( EPaymentMethod IN('Cash', 'Bank Transfer', 'Cheque', 'Credit', 'Other'))
+);
+
+ 
+
 DESCRIBE Journey;
 
 DROP TABLE Journey;
