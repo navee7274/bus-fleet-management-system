@@ -27,6 +27,8 @@ FLitersfilled DECIMAL(10,2) GENERATED ALWAYS AS(FCost/FPrice) STORED
 
 SELECT *FROM Bus;
 
+DESCRIBE bus;
+
 /* The Final Table
 FDate | FFuelPrice | FCost | FLitersFilled */
 
