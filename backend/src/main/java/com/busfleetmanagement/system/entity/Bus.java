@@ -2,63 +2,48 @@ package com.busfleetmanagement.system.entity;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "Bus")
+@Access(AccessType.FIELD)
 public class Bus {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "BusID")
-    private Integer busId;
+    @Column(name = "BRegistrationNo", nullable = false, unique = true, length = 20)
+    private String bRegistrationNo;
 
-    @Column(name = "BusNo", nullable = false, unique = true, length = 10)
-    private String busNo;
+    @Column(name = "BPurchaseDate", nullable = false)
+    private LocalDate purchaseDate;
 
-    @Column(name = "RegistrationNo", nullable = false, unique = true, length = 20)
-    private String registrationNo;
+    @Column(name = "BPurchasePrice", nullable = false)
+    private BigDecimal purchasePrice;
 
-    @Column(name = "Model", length = 50)
-    private String model;
-
-    @Column(name = "Capacity")
+    @Column(name = "BCapacity", nullable = false)
     private Integer capacity;
 
-    @Column(name = "Status", nullable = false, length = 20)
-    private String status;
+    @Column(name = "BNotes", nullable = false, length = 225)
+    private String notes;
+
+    @Column(name = "BActive", nullable = false)
+    private boolean active;
 
     public Bus() {
     }
 
-    public Integer getBusId() {
-        return busId;
-    }
+    public String getBusRegistrationNo() {return bRegistrationNo;}
 
-    public void setBusId(Integer busId) {
-        this.busId = busId;
-    }
+    public void setBusRegistrationNo(String bRegistrationNo) {this.bRegistrationNo = bRegistrationNo;}
 
-    public String getBusNo() {
-        return busNo;
-    }
+    public LocalDate getPurchaseDate() {return purchaseDate;}
 
-    public void setBusNo(String busNo) {
-        this.busNo = busNo;
-    }
+    public void setPurchaseDate(LocalDate purchaseDate) {this.purchaseDate = purchaseDate;}
 
-    public String getRegistrationNo() {
-        return registrationNo;
-    }
+    public BigDecimal getPurchasePrice() {return purchasePrice;}
 
-    public void setRegistrationNo(String registrationNo) {
-        this.registrationNo = registrationNo;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
+    public void setPurchasePrice(BigDecimal purchasePrice) {
+        this.purchasePrice = purchasePrice;
     }
 
     public Integer getCapacity() {
@@ -69,11 +54,13 @@ public class Bus {
         this.capacity = capacity;
     }
 
-    public String getStatus() {
-        return status;
-    }
+    public String getNotes() {return notes;}
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    public void setNotes(String notes) {this.notes = notes;}
+
+    public boolean isActive() {return active;}
+
+    public void setActive(boolean active) {this.active = active;}
+
+
 }
