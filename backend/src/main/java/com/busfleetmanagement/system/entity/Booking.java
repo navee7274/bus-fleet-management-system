@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Access(AccessType.FIELD)
 public class Booking {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "BookingID", nullable = false, unique = true)
     private int BookingID;
 
