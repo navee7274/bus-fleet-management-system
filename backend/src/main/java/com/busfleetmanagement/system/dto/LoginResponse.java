@@ -7,6 +7,9 @@ public class LoginResponse {
     private String username;
     private String name;
 
+    public LoginResponse(){
+    }
+
     public LoginResponse(String message, Integer ownerId, String username, String name){
         this.message = message;
         this.ownerId = ownerId;
