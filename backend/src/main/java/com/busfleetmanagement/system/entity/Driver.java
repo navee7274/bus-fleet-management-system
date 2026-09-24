@@ -31,8 +31,8 @@ public class Driver {
     @Column(name = "Notes", nullable = false, length = 500)
     private String Notes;
 
-    @Column(name = "Active", nullable = false)
-    private boolean Active;
+    @Column(name = "DActive", nullable = false)
+    private boolean DActive;
 
     public Driver() {
 
@@ -65,9 +65,9 @@ public class Driver {
 
     public void setNotes(String Notes) {this.Notes = Notes;}
 
-    public boolean isActive() {return Active;}
+    public boolean isDActive() {return DActive;}
 
-    public void setActive(boolean Active) {this.Active = Active;}
+    public void setDActive(boolean Active) {this.DActive = Active;}
 
 
 }
