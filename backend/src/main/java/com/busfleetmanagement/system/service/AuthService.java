@@ -6,6 +6,8 @@ import com.busfleetmanagement.system.entity.Owner;
 import com.busfleetmanagement.system.repository.OwnerRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class AuthService {
 
@@ -17,12 +19,14 @@ public class AuthService {
 
     public LoginResponse login(LoginRequest request) {
 
-        Owner owner = ownerRepository.findByUsername(request.getUsername())
-                .orElse(null);
+        Optional<Owner> ownerOptional =
+                ownerRepository.findByUsername(request.getUsername());
 
-        if (owner == null) {
+        if (ownerOptional.isEmpty()) {
             throw new RuntimeException("Invalid username or password");
         }
+
+        Owner owner = ownerOptional.get();
 
         if (!owner.getPassword().equals(request.getPassword())) {
             throw new RuntimeException("Invalid username or password");
