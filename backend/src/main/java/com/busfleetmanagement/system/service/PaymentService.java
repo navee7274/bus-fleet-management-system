@@ -1,4 +1,7 @@
 package com.busfleetmanagement.system.service;
 
-public interface PaymentService {
+import org.springframework.stereotype.Service;
+
+@Service
+public class PaymentService {
 }
