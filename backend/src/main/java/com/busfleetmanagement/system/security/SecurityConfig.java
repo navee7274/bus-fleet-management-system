@@ -1,4 +1,4 @@
-package com.busfleetmanagement.system.config;
+package com.busfleetmanagement.system.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
