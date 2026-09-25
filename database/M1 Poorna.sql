@@ -1,21 +1,28 @@
 USE bus_fleet_management_001;
 
--- Creating the Bus Table
-CREATE TABLE Bus(
-BRegistrationNo VARCHAR(20) PRIMARY KEY,
-BPurchaseDate DATE NOT NULL,
-BPurchasePrice DECIMAL(10,2) NOT NULL,
-BNotes VARCHAR(225),
-BActive BOOLEAN DEFAULT TRUE NOT NULL
+-- Journey Table
+CREATE TABLE Journey(
+JourneyID INT AUTO_INCREMENT PRIMARY KEY,
+JourneyDate DATE NOT NULL,
+BRegistrationNo VARCHAR(20) NOT NULL,
+DriverID VARCHAR(30) NOT NULL,
+Purpose VARCHAR(30) NOT NULL,
+ClientDestination VARCHAR(225) NOT NULL,
+StartOdometer DECIMAL(10,2) NOT NULL,
+EndOdometer DECIMAL(10,2) NOT NULL,
+KMTravelled DECIMAL(10,2) GENERATED ALWAYS AS (EndOdometer - StartOdometer) STORED,
+IncomeAmount DECIMAL(10,2) DEFAULT 0.00,
+Notes VARCHAR(255),
+FOREIGN KEY (BRegistrationNo) REFERENCES Bus(BRegistrationNo),
+FOREIGN KEY (DriverID) REFERENCES Driver(DriverID),
+CHECK (EndOdometer >= StartOdometer),
+CHECK (IncomeAmount) >= 0)
 );
 
--- Adding the Capacity column to the Bus table
-ALTER TABLE Bus ADD COLUMN BCapacity INT AFTER BPurchasePrice;
+/* The Final Table
+JourneyID | JourneyDate | BRegistrationNo | DriverID | Purpose | ClientDestination | StartOdometer | EndOdometer | KMTraveled | IncomeAmount | Notes
+*/
 
-SELECT *FROM Bus;
-
-/* The Final Bus Table 
-BRegistrationNo | BPurchaseDate | BPurchasePrice | BCapacity | BNotes | BActive */
 
 -- Creating the FuelLog Table
 CREATE TABLE FuelLog(
@@ -26,6 +33,7 @@ FLitersfilled DECIMAL(10,2) GENERATED ALWAYS AS(FCost/FPrice) STORED
 );
 
 SELECT *FROM Bus;
+DROP TABLE Bus;
 
 DESCRIBE bus;
 
