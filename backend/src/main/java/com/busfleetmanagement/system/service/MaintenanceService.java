@@ -31,18 +31,18 @@ public class MaintenanceService {
     }
 
     // UPDATE MAINTENANCE RECORD
-    public MaintenanceLog updateBus(int MaintenanceID, MaintenanceLog bus) {
+    public MaintenanceLog updateMaintenanceRecord(int MaintenanceID, MaintenanceLog maintenanceRecord) {
 
         MaintenanceLog existingRecord = maintenanceRepository.findById(MaintenanceID)
                 .orElseThrow(() -> new RuntimeException("Maintenance record not found"));
 
-        existingRecord.setMaintenanceDate(bus.getMaintenanceDate());
-        existingRecord.setBus(bus.getBus());
-        existingRecord.setMType(bus.getMType());
-        existingRecord.setDescription(bus.getDescription());
-        existingRecord.setCost(bus.getCost());
-        existingRecord.setOdometer(bus.getOdometer());
-        existingRecord.setNextServiceDue(bus.getNextServiceDue());
+        existingRecord.setMaintenanceDate(maintenanceRecord.getMaintenanceDate());
+        existingRecord.setBus(maintenanceRecord.getBus());
+        existingRecord.setMType(maintenanceRecord.getMType());
+        existingRecord.setDescription(maintenanceRecord.getDescription());
+        existingRecord.setCost(maintenanceRecord.getCost());
+        existingRecord.setOdometer(maintenanceRecord.getOdometer());
+        existingRecord.setNextServiceDue(maintenanceRecord.getNextServiceDue());
 
         return maintenanceRepository.save(existingRecord);
     }

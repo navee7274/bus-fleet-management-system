@@ -135,9 +135,7 @@ public class Booking {
         EstimatedCost = estimatedCost;
     }
 
-    public BigDecimal getFinalPrice() {
-        return FinalPrice;
-    }
+    public BigDecimal getFinalPrice() {return FinalPrice;}
 
     public void setFinalPrice(BigDecimal finalPrice) {
         FinalPrice = finalPrice;
