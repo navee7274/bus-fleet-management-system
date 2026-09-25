@@ -50,7 +50,6 @@ public class Journey {
     public Journey() {
     }
 
-
     public int getJourneyID() {
         return journeyID;
     }
