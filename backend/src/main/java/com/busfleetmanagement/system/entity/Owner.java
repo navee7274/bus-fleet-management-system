@@ -25,9 +25,12 @@ public class Owner {
     @Column(name = "ContactNo", length = 20)
     private String contactNo;
 
+    public Owner() {
+    }
+
     public Owner(String username, String password, String name, String contactNo){
         this.username = username;
-        this.password = name;
+        this.password = password;
         this.name = name;
         this.contactNo = contactNo;
     }
