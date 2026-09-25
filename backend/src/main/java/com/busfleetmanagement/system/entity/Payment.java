@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Access(AccessType.FIELD)
 public class Payment {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PaymentID", nullable = false, unique = true)
     private int PaymentID;
 
