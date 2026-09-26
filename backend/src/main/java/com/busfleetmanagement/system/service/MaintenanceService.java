@@ -26,7 +26,7 @@ public class MaintenanceService {
     }
 
     // READ ONLY ONE MAINTENANCE RECORD
-    public Optional<MaintenanceLog> getMaintenanceRecordById(int MaintenanceID) {
+    public Optional<MaintenanceLog> geteMaintenancRecordById(int MaintenanceID) {
         return maintenanceRepository.findById(MaintenanceID);
     }
 
