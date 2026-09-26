@@ -16,7 +16,7 @@ Notes VARCHAR(255),
 FOREIGN KEY (BRegistrationNo) REFERENCES Bus(BRegistrationNo),
 FOREIGN KEY (DriverID) REFERENCES Driver(DriverID),
 CHECK (EndOdometer >= StartOdometer),
-CHECK (IncomeAmount) >= 0)
+CHECK (IncomeAmount >= 0)
 );
 
 /* The Final Table
