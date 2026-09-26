@@ -1,6 +1,6 @@
 USE bus_fleet_management_001;
 
--- Driver table
+-- Driver table.
 
 CREATE TABLE Driver (
     DriverID CHAR(10) PRIMARY KEY,
@@ -15,20 +15,7 @@ ALTER TABLE Driver ADD COLUMN  DActive BOOLEAN AFTER notes;
 
 SELECT * FROM Driver;
 
-CREATE TABLE Driver_Salary (
-    CurrentYear int NOT NULL,
-    CurrentMonth int NOT NULL,
-    TripsCompleted int,
-    BaseSalary DECIMAL(10, 2),
-    PerTripAllowance DECIMAL(10, 2),
-    MonthlySalary DECIMAL(10,2),
-	CONSTRAINT fkDriverID FOREIGN KEY (DriverID) REFERENCES Driver(DriverID ) ON DELETE CASCADE ON UPDATE CASCADE
-);
-SELECT * FROM Driver_Salary;
-
-DROP TABLE Driver_Salary;
-
--- BUS table
+-- BUS table.
 CREATE TABLE Bus(
     BRegistrationNo VARCHAR(20) PRIMARY KEY,
     BPurchaseDate DATE NOT NULL,
@@ -38,3 +25,9 @@ CREATE TABLE Bus(
     BCapacity INT
 );
 SELECT *FROM Bus;
+
+/* The Final Bus Table 
+BRegistrationNo | BPurchaseDate | BPurchasePrice | BCapacity | BNotes | BActive */
+
+/* The Final Driver Table 
+DriverID | Name | NIC | ContactNo | BaseMonthlySalary | PerTripAllowence | notes | DActive*/
