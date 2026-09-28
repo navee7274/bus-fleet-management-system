@@ -1,5 +1,8 @@
 USE bus_fleet_management_001;
 
+DROP TABLE Payment;
+DROP TABLE Booking;
+
 -- Booking Table
 
 CREATE TABLE Booking (
@@ -12,20 +15,25 @@ CREATE TABLE Booking (
     Destination VARCHAR(255) NOT NULL,
     PassengerCount INT NOT NULL,
     BRegistrationNo VARCHAR(20),
+    DriverID CHAR(10),
     EstimatedCost DECIMAL(12,2),
     FinalPrice DECIMAL(12,2),
     BookingStatus ENUM(
-        'Temporary',
-        'Pending Payment',
-        'Confirmed',
-        'Cancelled',
-        'Completed'
-    ) NOT NULL DEFAULT 'Temporary',
+        'PENDING',
+		'PAYMENT_PENDING',
+		'CONFIRMED',
+		'COMPLETED',
+		'REJECTED',
+		'CANCELLED'
+    ) NOT NULL DEFAULT 'PENDING',
     CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_booking_bus
         FOREIGN KEY (BRegistrationNo)
         REFERENCES Bus(BRegistrationNo),
+	CONSTRAINT fk_booking_driver
+        FOREIGN KEY (DriverID)
+        REFERENCES Driver(DriverID),
     CONSTRAINT chk_booking_passengers
         CHECK (PassengerCount > 0),
     CONSTRAINT chk_booking_datetime
@@ -44,11 +52,12 @@ CREATE TABLE Payment (
 	PaymentDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PaymentMethod VARCHAR(50),
     PaymentStatus ENUM(
-        'Pending',
-        'Paid',
-        'Failed',
-        'Refunded'
-    ) NOT NULL DEFAULT 'Pending',
+        'PENDING',
+		'PROCESSING',
+		'SUCCESS',
+		'FAILED',
+		'REFUNDED'
+    ) NOT NULL DEFAULT 'PENDING',
     TransactionReference VARCHAR(100) UNIQUE,
 
     CONSTRAINT fk_payment_booking
@@ -58,4 +67,3 @@ CREATE TABLE Payment (
         CHECK (Amount > 0)
 );
 
-DROP TABLE MaintenanceLog;
