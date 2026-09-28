@@ -35,12 +35,13 @@ FLitersfilled DECIMAL(10,2) GENERATED ALWAYS AS(FCost/FPrice) STORED,
 FOREIGN KEY (BRegistrationNo) REFERENCES Bus(BRegistrationNo)
 );
 
-SELECT *FROM Bus;
 DROP TABLE FuelLog;
+DROP TABLE Journey;
 
 DESCRIBE FuelLog;
+DESCRIBE Journey;
 
 /* The Final Table
-FDate | FFuelPrice | FCost | FLitersFilled */
+FuelLogID | BRegistrationNo | FDate | FFuelPrice | FCost | FLitersFilled */
 
 
