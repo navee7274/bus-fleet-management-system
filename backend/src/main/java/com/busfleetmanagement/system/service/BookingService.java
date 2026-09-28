@@ -26,8 +26,6 @@ public class BookingService {
     private DriverRepository driverRepository;
     private PaymentRepository paymentRepository;
 
-    private BigDecimal advanceAmountPerBooking = BigDecimal.valueOf(10000.00);
-
     public BookingService(BookingRepository bookingRepository){
         this.bookingRepository = bookingRepository;
     }
@@ -94,6 +92,7 @@ public class BookingService {
         existingBooking.setCustomerAddress(booking.getCustomerAddress());
         existingBooking.setCustomerCity(booking.getCustomerCity());
         existingBooking.setStartDateTime(booking.getStartDateTime());
+        existingBooking.setAdvanceAmount(booking.getAdvanceAmount());
         existingBooking.setEndDateTime(booking.getEndDateTime());
         existingBooking.setStartLocation(booking.getStartLocation());
         existingBooking.setDestination(booking.getDestination());
@@ -218,7 +217,7 @@ public class BookingService {
 
         Payment payment = new Payment();
         payment.setBooking(booking);
-        payment.setAmount(advanceAmountPerBooking);
+        payment.setAmount(booking.getAdvanceAmount());
         payment.setPaymentDate(LocalDateTime.now());
         payment.setPaymentStatus(PaymentStatus.SUCCESS);
 
