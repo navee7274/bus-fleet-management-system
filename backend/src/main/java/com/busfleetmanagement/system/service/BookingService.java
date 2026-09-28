@@ -77,32 +77,28 @@ public class BookingService {
     }
 
     // UPDATE BOOKING
-    public Booking updateBooking(int BookingId, Booking booking){
+    public Booking updateBooking(int BookingId, Booking booking) {
 
         Booking existingBooking = bookingRepository.findById(BookingId)
-                .orElseThrow(()-> new RuntimeException("Booking not found"));
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        // VALIDATING CUSTOMER DETAILS
+        // Validate updated customer/trip details
         validateAll(booking);
 
+        // Customer details
         existingBooking.setCustomerFirstName(booking.getCustomerFirstName());
         existingBooking.setCustomerLastName(booking.getCustomerLastName());
         existingBooking.setCustomerContactPhone(booking.getCustomerContactPhone());
         existingBooking.setCustomerContactEmail(booking.getCustomerContactEmail());
         existingBooking.setCustomerAddress(booking.getCustomerAddress());
         existingBooking.setCustomerCity(booking.getCustomerCity());
+
+        // Journey details
         existingBooking.setStartDateTime(booking.getStartDateTime());
-        existingBooking.setAdvanceAmount(booking.getAdvanceAmount());
         existingBooking.setEndDateTime(booking.getEndDateTime());
         existingBooking.setStartLocation(booking.getStartLocation());
         existingBooking.setDestination(booking.getDestination());
         existingBooking.setPassengerCount(booking.getPassengerCount());
-        existingBooking.setBus(booking.getBus());
-        existingBooking.setDriver(booking.getDriver());
-        existingBooking.setEstimatedCost(booking.getEstimatedCost());
-        existingBooking.setFinalPrice(booking.getFinalPrice());
-        existingBooking.setStatus(booking.getStatus());
-        existingBooking.setCreatedAt(booking.getCreatedAt());
 
         return bookingRepository.save(existingBooking);
     }
