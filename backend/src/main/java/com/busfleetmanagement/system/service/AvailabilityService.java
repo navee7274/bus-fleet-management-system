@@ -1,4 +1,4 @@
 package com.busfleetmanagement.system.service;
 
-public interface AvailabilityService {
+public class AvailabilityService {
 }

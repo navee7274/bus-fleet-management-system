@@ -1,5 +1,6 @@
 package com.busfleetmanagement.system.entity;
 
+import com.busfleetmanagement.system.enums.BookingStatus;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -39,21 +40,29 @@ public class Booking {
     @JoinColumn(name = "BRegistrationNo", referencedColumnName = "BRegistrationNo")
     private Bus bus;
 
+    @ManyToOne
+    @JoinColumn(name = "DriverID", referencedColumnName = "DriverID")
+    private Driver driver;
+
     @Column(name = "EstimatedCost", nullable = false)
     private BigDecimal EstimatedCost;
 
-    @Column(name = "FinalPrice", nullable = false)
+    @Column(name = "FinalPrice", nullable = true)
     private BigDecimal FinalPrice;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "BookingStatus", nullable = false, length = 30)
-    private String Status;
+    private BookingStatus Status;
 
     @Column(name = "CreatedAt",  nullable = false)
     private LocalDateTime CreatedAt;
 
+    @OneToOne
+    @JoinColumn(name = "JourneyID", referencedColumnName = "JourneyID")
+    private Journey journey;
+
     public Booking(){
     }
-
 
     public int getBookingID() {
         return BookingID;
@@ -141,11 +150,11 @@ public class Booking {
         FinalPrice = finalPrice;
     }
 
-    public String getStatus() {
+    public BookingStatus getStatus() {
         return Status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(BookingStatus status) {
         Status = status;
     }
 
@@ -155,5 +164,21 @@ public class Booking {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         CreatedAt = createdAt;
+    }
+
+    public Driver getDriver() {
+        return driver;
+    }
+
+    public void setDriver(Driver driver) {
+        this.driver = driver;
+    }
+
+    public Journey getJourney() {
+        return journey;
+    }
+
+    public void setJourney(Journey journey) {
+        this.journey = journey;
     }
 }
