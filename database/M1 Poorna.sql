@@ -26,6 +26,8 @@ JourneyID | JourneyDate | BRegistrationNo | DriverID | Purpose | ClientDestinati
 
 -- Creating the FuelLog Table
 CREATE TABLE FuelLog(
+FuelLogID INT AUTO_INCREMENT PRIMARY KEY,
+BRegistrationNo VARCHAR(20) NOT NULL,
 FDate DATE NOT NULL,
 FPrice DECIMAL(10,2) NOT NULL,
 FCost DECIMAL(10,2) NOT NULL,
