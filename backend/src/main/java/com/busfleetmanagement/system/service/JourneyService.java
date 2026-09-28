@@ -18,8 +18,8 @@ public class JourneyService {
     private final DriverRepository driverRepository;
 
     public JourneyService(
-            JourneyRepository journeyRepository;
-            BusRepository busRepository;
+            JourneyRepository journeyRepository,
+            BusRepository busRepository,
             DriverRepository driverRepository){
 
                 this.journeyRepository = journeyRepository;
