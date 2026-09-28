@@ -5,5 +5,5 @@ import com.busfleetmanagement.system.entity.Journey;
 import java.util.List;
 
 public interface JourneyRepository {
-    List<Journey> findByBusAndStartDateTimeLessThanAn();
+   
 }
