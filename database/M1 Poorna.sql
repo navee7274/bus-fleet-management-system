@@ -31,13 +31,14 @@ BRegistrationNo VARCHAR(20) NOT NULL,
 FDate DATE NOT NULL,
 FPrice DECIMAL(10,2) NOT NULL,
 FCost DECIMAL(10,2) NOT NULL,
-FLitersfilled DECIMAL(10,2) GENERATED ALWAYS AS(FCost/FPrice) STORED
+FLitersfilled DECIMAL(10,2) GENERATED ALWAYS AS(FCost/FPrice) STORED,
+FOREIGN KEY (BRegistrationNo) REFERENCES Bus(BRegistrationNo)
 );
 
 SELECT *FROM Bus;
-DROP TABLE Bus;
+DROP TABLE FuelLog;
 
-DESCRIBE bus;
+DESCRIBE FuelLog;
 
 /* The Final Table
 FDate | FFuelPrice | FCost | FLitersFilled */
