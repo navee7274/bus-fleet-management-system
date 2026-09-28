@@ -10,6 +10,15 @@ import java.util.Date;
 @Access(AccessType.FIELD)
 
 public class FuelLog {
+
+    @Id
+    @Column(name = "FuelLogID", nullable = false, unique = true, length = 20)
+    private int FuelLogID;
+
+    @ManyToOne
+    @JoinColumn(name = "BRegistrationNo", referencedColumnName = "BRegistrationNo")
+    private Bus bus;
+
     @Column(name = "FDate", nullable = false, unique = false, length = 10)
     private Date fDate;
 
@@ -23,6 +32,22 @@ public class FuelLog {
     private BigDecimal fLitersfilled;
 
     public FuelLog() {
+    }
+
+    public int getFuelLogID() {
+        return FuelLogID;
+    }
+
+    public void setFuelLogID(int fuelLogID) {
+        FuelLogID = fuelLogID;
+    }
+
+    public Bus getBus() {
+        return bus;
+    }
+
+    public void setBus(Bus bus) {
+        this.bus = bus;
     }
 
     public Date getfDate() {

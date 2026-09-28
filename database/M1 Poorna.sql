@@ -26,18 +26,22 @@ JourneyID | JourneyDate | BRegistrationNo | DriverID | Purpose | ClientDestinati
 
 -- Creating the FuelLog Table
 CREATE TABLE FuelLog(
+FuelLogID INT AUTO_INCREMENT PRIMARY KEY,
+BRegistrationNo VARCHAR(20) NOT NULL,
 FDate DATE NOT NULL,
 FPrice DECIMAL(10,2) NOT NULL,
 FCost DECIMAL(10,2) NOT NULL,
-FLitersfilled DECIMAL(10,2) GENERATED ALWAYS AS(FCost/FPrice) STORED
+FLitersfilled DECIMAL(10,2) GENERATED ALWAYS AS(FCost/FPrice) STORED,
+FOREIGN KEY (BRegistrationNo) REFERENCES Bus(BRegistrationNo)
 );
 
-SELECT *FROM Bus;
-DROP TABLE Bus;
+DROP TABLE FuelLog;
+DROP TABLE Journey;
 
-DESCRIBE bus;
+DESCRIBE FuelLog;
+DESCRIBE Journey;
 
 /* The Final Table
-FDate | FFuelPrice | FCost | FLitersFilled */
+FuelLogID | BRegistrationNo | FDate | FFuelPrice | FCost | FLitersFilled */
 
 
