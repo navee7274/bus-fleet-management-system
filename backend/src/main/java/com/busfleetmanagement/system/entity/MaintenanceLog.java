@@ -8,6 +8,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "MaintenanceLog")
 @Access(AccessType.FIELD)
+
 public class MaintenanceLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

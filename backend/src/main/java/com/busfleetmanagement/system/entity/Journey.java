@@ -9,6 +9,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "Journey")
 @Access(AccessType.FIELD)
+
 public class Journey {
 
     @Id
