@@ -27,6 +27,7 @@ CREATE TABLE Booking (
 		'CANCELLED'
     ) NOT NULL DEFAULT 'PENDING',
     CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    JourneyID INT,
 
     CONSTRAINT fk_booking_bus
         FOREIGN KEY (BRegistrationNo)
@@ -34,6 +35,9 @@ CREATE TABLE Booking (
 	CONSTRAINT fk_booking_driver
         FOREIGN KEY (DriverID)
         REFERENCES Driver(DriverID),
+	CONSTRAINT fk_booking_journey
+        FOREIGN KEY (JourneyID)
+        REFERENCES Journey(JourneyID),
     CONSTRAINT chk_booking_passengers
         CHECK (PassengerCount > 0),
     CONSTRAINT chk_booking_datetime
@@ -43,6 +47,8 @@ CREATE TABLE Booking (
     CONSTRAINT chk_booking_final_price
         CHECK (FinalPrice IS NULL OR FinalPrice >= 0)
 );
+
+DESCRIBE Booking;
 
 
 CREATE TABLE Payment (

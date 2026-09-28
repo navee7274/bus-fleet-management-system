@@ -5,6 +5,7 @@ import com.busfleetmanagement.system.dto.BookingResponse;
 import com.busfleetmanagement.system.entity.Booking;
 import com.busfleetmanagement.system.enums.BookingStatus;
 import com.busfleetmanagement.system.exception.ResourceNotFoundException;
+import com.busfleetmanagement.system.service.AvailabilityService;
 import com.busfleetmanagement.system.service.BookingService;
 
 import jakarta.validation.Valid;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/bookings")
@@ -22,9 +24,11 @@ import java.util.List;
 public class BookingController {
 
     private final BookingService bookingService;
+    private final AvailabilityService availabilityService;
 
-    public BookingController(BookingService bookingService) {
+    public BookingController(BookingService bookingService, AvailabilityService availabilityService) {
         this.bookingService = bookingService;
+        this.availabilityService = availabilityService;
     }
 
     private BookingResponse toResponse(Booking booking) {
@@ -64,6 +68,16 @@ public class BookingController {
         }
 
         return response;
+    }
+
+    private Optional<BookingResponse> toResponse(Optional<Booking> booking) {
+        return booking.map(this::toResponse);
+    }
+
+    private List<BookingResponse> toResponse(List<Booking> bookings) {
+        return bookings.stream()
+                .map(this::toResponse)
+                .toList();
     }
 
 
@@ -155,11 +169,9 @@ public class BookingController {
             @RequestParam int passengerCount) {
 
         return ResponseEntity.ok(
-                availa.getAvailableBuses(
+                availabilityService.getAvailableBuses(
                         startDateTime,
                         endDateTime,
-                        startLocation,
-                        destination,
                         passengerCount
                 )
         );
@@ -193,7 +205,7 @@ public class BookingController {
     public ResponseEntity<List<BookingResponse>> getPendingBookings() {
 
         return ResponseEntity.ok(
-                bookingService.getPendingBookings()
+                toResponse(bookingService.getPendingBookings())
         );
     }
 
@@ -207,6 +219,7 @@ public class BookingController {
 
         return ResponseEntity.ok(
                 toResponse(bookingService.getBooking(bookingId))
+                        .orElseThrow(()-> new ResourceNotFoundException("Booking not found"))
         );
     }
 

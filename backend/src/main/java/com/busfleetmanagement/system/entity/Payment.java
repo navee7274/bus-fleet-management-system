@@ -1,5 +1,6 @@
 package com.busfleetmanagement.system.entity;
 
+import com.busfleetmanagement.system.enums.PaymentStatus;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -27,8 +28,9 @@ public class Payment {
     @Column(name = "PaymentMethod", nullable = false, length = 50)
     private String PaymentMethod;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "PaymentStatus", nullable = false)
-    private String PaymentStatus;
+    private PaymentStatus paymentStatus;
 
     @Column(name = "TransactionReference", nullable = false, length = 100)
     private String TransactionReference;
@@ -76,12 +78,12 @@ public class Payment {
         PaymentMethod = paymentMethod;
     }
 
-    public String getPaymentStatus() {
-        return PaymentStatus;
+    public PaymentStatus getPaymentStatus() {
+        return paymentStatus;
     }
 
-    public void setPaymentStatus(String paymentStatus) {
-        PaymentStatus = paymentStatus;
+    public void setPaymentStatus(PaymentStatus paymentStatus) {
+        this.paymentStatus = paymentStatus;
     }
 
     public String getTransactionReference() {

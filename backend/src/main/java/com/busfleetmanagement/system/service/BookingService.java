@@ -3,14 +3,19 @@ package com.busfleetmanagement.system.service;
 import com.busfleetmanagement.system.entity.Booking;
 import com.busfleetmanagement.system.entity.Bus;
 import com.busfleetmanagement.system.entity.Driver;
+import com.busfleetmanagement.system.entity.Payment;
 import com.busfleetmanagement.system.enums.BookingStatus;
+import com.busfleetmanagement.system.enums.PaymentStatus;
 import com.busfleetmanagement.system.exception.ResourceNotFoundException;
 import com.busfleetmanagement.system.repository.BookingRepository;
 import com.busfleetmanagement.system.repository.BusRepository;
 import com.busfleetmanagement.system.repository.DriverRepository;
+import com.busfleetmanagement.system.repository.PaymentRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +24,9 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private BusRepository busRepository;
     private DriverRepository driverRepository;
+    private PaymentRepository paymentRepository;
+
+    private BigDecimal advanceAmountPerBooking = BigDecimal.valueOf(5000.00);
 
     public BookingService(BookingRepository bookingRepository){
         this.bookingRepository = bookingRepository;
@@ -151,5 +159,30 @@ public class BookingService {
         toCompleteBooking.setStatus(BookingStatus.COMPLETED);
 
         return bookingRepository.save(toCompleteBooking);
+    }
+
+    @Transactional
+    public Booking makePayment(int BookingID) {
+
+        Booking booking = bookingRepository.findById(BookingID)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        if (booking.getStatus() != BookingStatus.PAYMENT_PENDING) {
+            throw new RuntimeException(
+                    "Payment cannot be made for this booking"
+            );
+        }
+
+        Payment payment = new Payment();
+        payment.setBooking(booking);
+        payment.setAmount(advanceAmountPerBooking);
+        payment.setPaymentDate(LocalDateTime.now());
+        payment.setPaymentStatus(PaymentStatus.SUCCESS);
+
+        paymentRepository.save(payment);
+
+        booking.setStatus(BookingStatus.CONFIRMED);
+
+        return bookingRepository.save(booking);
     }
 }
