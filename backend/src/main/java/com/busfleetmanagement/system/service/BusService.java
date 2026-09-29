@@ -4,10 +4,12 @@ import com.busfleetmanagement.system.entity.Bus;
 import com.busfleetmanagement.system.entity.Driver;
 import com.busfleetmanagement.system.repository.BusRepository;
 import com.busfleetmanagement.system.repository.DriverRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class  BusService {
     private final BusRepository BusRepository;
 
