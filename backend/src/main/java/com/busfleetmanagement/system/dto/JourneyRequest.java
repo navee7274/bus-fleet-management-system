@@ -8,7 +8,7 @@ public class JourneyRequest {
     private int journeyID;
     private LocalDate journeyDate;
     private String busRegistrationNo;
-    private int driverID;
+    private String driverID;
     private String purpose;
     private String clientDestination;
     private BigDecimal startOdometer;
@@ -44,11 +44,11 @@ public class JourneyRequest {
         this.busRegistrationNo = busRegistrationNo;
     }
 
-    public int getDriverID() {
+    public String getDriverID() {
         return driverID;
     }
 
-    public void setDriverID(int driverID) {
+    public void setDriverID(String driverID) {
         this.driverID = driverID;
     }
 
