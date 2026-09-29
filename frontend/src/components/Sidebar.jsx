@@ -3,7 +3,6 @@ import { NavLink } from "react-router-dom";
 function Sidebar() {
   return (
     <aside className="sidebar">
-      ```
       <div className="sidebar-logo">Bus Fleet</div>
       <nav>
         <NavLink to="/dashboard">Dashboard</NavLink>

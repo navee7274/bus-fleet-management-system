@@ -1,20 +1,45 @@
 package com.busfleetmanagement.system.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 
 public class BookingRequest {
 
+    // Customer Details
     @NotBlank
-    private String customerName;
+    @Size(max = 20)
+    private String customerFirstName;
 
     @NotBlank
-    private String customerContact;
+    @Size(max = 20)
+    private String customerLastName;
 
+    @NotBlank
+    @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must contain exactly 10 digits")
+    private String customerContactPhone;
+
+    @NotBlank
+    @Email
+    @Size(max = 70)
+    private String customerContactEmail;
+
+    @NotBlank
+    @Size(max = 100)
+    private String customerAddress;
+
+    @NotBlank
+    @Size(max = 50)
+    private String customerCity;
+
+
+    // Booking Details
     @NotNull
     @Future
     private LocalDateTime startDateTime;
@@ -24,29 +49,65 @@ public class BookingRequest {
     private LocalDateTime endDateTime;
 
     @NotBlank
+    @Size(max = 255)
     private String startLocation;
 
     @NotBlank
+    @Size(max = 255)
     private String destination;
 
-    @Min(1)
+    @Min(value = 1, message = "Passenger count must be at least 1")
     private int passengerCount;
 
 
-    public String getCustomerName() {
-        return customerName;
+    // Getters and Setters
+
+    public String getCustomerFirstName() {
+        return customerFirstName;
     }
 
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
+    public void setCustomerFirstName(String customerFirstName) {
+        this.customerFirstName = customerFirstName;
     }
 
-    public String getCustomerContact() {
-        return customerContact;
+    public String getCustomerLastName() {
+        return customerLastName;
     }
 
-    public void setCustomerContact(String customerContact) {
-        this.customerContact = customerContact;
+    public void setCustomerLastName(String customerLastName) {
+        this.customerLastName = customerLastName;
+    }
+
+    public String getCustomerContactPhone() {
+        return customerContactPhone;
+    }
+
+    public void setCustomerContactPhone(String customerContactPhone) {
+        this.customerContactPhone = customerContactPhone;
+    }
+
+    public String getCustomerContactEmail() {
+        return customerContactEmail;
+    }
+
+    public void setCustomerContactEmail(String customerContactEmail) {
+        this.customerContactEmail = customerContactEmail;
+    }
+
+    public String getCustomerAddress() {
+        return customerAddress;
+    }
+
+    public void setCustomerAddress(String customerAddress) {
+        this.customerAddress = customerAddress;
+    }
+
+    public String getCustomerCity() {
+        return customerCity;
+    }
+
+    public void setCustomerCity(String customerCity) {
+        this.customerCity = customerCity;
     }
 
     public LocalDateTime getStartDateTime() {

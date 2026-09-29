@@ -12,7 +12,7 @@ public class PayHereConfig {
     @Value("${payhere.merchant-secret}")
     private String merchantSecret;
 
-    @Value("${payhere.checkout-url}")
+    @Value("${payhere.return-url}")
     private String checkoutUrl;
 
     @Value("${payhere.return-url}")
