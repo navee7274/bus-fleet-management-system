@@ -40,9 +40,7 @@ public class PayHereService {
                 );
 
         if (booking.getStatus() != BookingStatus.PAYMENT_PENDING) {
-            throw new RuntimeException(
-                    "Booking is not waiting for payment"
-            );
+            throw new RuntimeException("Booking is not waiting for payment");
         }
 
         /*

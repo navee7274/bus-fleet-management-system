@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/bookings")
@@ -26,41 +25,64 @@ public class BookingController {
     private final BookingService bookingService;
     private final AvailabilityService availabilityService;
 
-    public BookingController(BookingService bookingService, AvailabilityService availabilityService) {
+    public BookingController(
+            BookingService bookingService,
+            AvailabilityService availabilityService
+    ) {
         this.bookingService = bookingService;
         this.availabilityService = availabilityService;
     }
+
+
+    // =========================================================
+    // RESPONSE MAPPER
+    // =========================================================
 
     private BookingResponse toResponse(Booking booking) {
 
         BookingResponse response = new BookingResponse();
 
         response.setBookingID(booking.getBookingID());
-        response.setCustomerName(booking.getCustomerName());
-        response.setCustomerContact(booking.getCustomerContact());
+
+        // Customer Details
+        response.setCustomerFirstName(booking.getCustomerFirstName());
+        response.setCustomerLastName(booking.getCustomerLastName());
+        response.setCustomerContactPhone(booking.getCustomerContactPhone());
+        response.setCustomerContactEmail(booking.getCustomerContactEmail());
+        response.setCustomerAddress(booking.getCustomerAddress());
+        response.setCustomerCity(booking.getCustomerCity());
+
+        // Booking Details
         response.setStartDateTime(booking.getStartDateTime());
         response.setEndDateTime(booking.getEndDateTime());
         response.setStartLocation(booking.getStartLocation());
         response.setDestination(booking.getDestination());
         response.setPassengerCount(booking.getPassengerCount());
 
+        // Bus
         if (booking.getBus() != null) {
             response.setBusRegistrationNo(
                     booking.getBus().getBusRegistrationNo()
             );
         }
 
+        // Driver
         if (booking.getDriver() != null) {
             response.setDriverID(
                     booking.getDriver().getDriverID()
             );
         }
 
+        // Pricing
         response.setEstimatedCost(booking.getEstimatedCost());
         response.setFinalPrice(booking.getFinalPrice());
+        response.setAdvanceAmount(booking.getAdvanceAmount());
+
+        // Status & creation time
         response.setStatus(booking.getStatus());
         response.setCreatedAt(booking.getCreatedAt());
 
+        // Journey
         if (booking.getJourney() != null) {
             response.setJourneyID(
                     booking.getJourney().getJourneyID()
@@ -68,10 +90,6 @@ public class BookingController {
         }
 
         return response;
-    }
-
-    private Optional<BookingResponse> toResponse(Optional<Booking> booking) {
-        return booking.map(this::toResponse);
     }
 
     private List<BookingResponse> toResponse(List<Booking> bookings) {
@@ -87,7 +105,6 @@ public class BookingController {
 
     /**
      * Create a temporary booking request.
-     *
      * Customer does NOT need to be logged in.
      */
     @PostMapping
@@ -96,8 +113,15 @@ public class BookingController {
 
         Booking booking = new Booking();
 
-        booking.setCustomerName(request.getCustomerName());
-        booking.setCustomerContact(request.getCustomerContact());
+        // Customer Details
+        booking.setCustomerFirstName(request.getCustomerFirstName());
+        booking.setCustomerLastName(request.getCustomerLastName());
+        booking.setCustomerContactPhone(request.getCustomerContactPhone());
+        booking.setCustomerContactEmail(request.getCustomerContactEmail());
+        booking.setCustomerAddress(request.getCustomerAddress());
+        booking.setCustomerCity(request.getCustomerCity());
+
+        // Booking Details
         booking.setStartDateTime(request.getStartDateTime());
         booking.setEndDateTime(request.getEndDateTime());
         booking.setStartLocation(request.getStartLocation());
@@ -107,34 +131,21 @@ public class BookingController {
         // Initial booking state
         booking.setStatus(BookingStatus.PENDING);
 
-        // Set this according to your cost calculation
+        // Initial pricing
         booking.setEstimatedCost(BigDecimal.ZERO);
+        booking.setFinalPrice(null);
 
-        // Until owner sets the price
-        booking.setFinalPrice(BigDecimal.ZERO);
-
+        // Created timestamp
         booking.setCreatedAt(LocalDateTime.now());
+
+        // Advance amount is already initialized to 8000
+        // in the Booking entity
 
         Booking savedBooking = bookingService.createBooking(booking);
 
-        BookingResponse response = new BookingResponse();
-
-        response.setBookingID(savedBooking.getBookingID());
-        response.setCustomerName(savedBooking.getCustomerName());
-        response.setCustomerContact(savedBooking.getCustomerContact());
-        response.setStartDateTime(savedBooking.getStartDateTime());
-        response.setEndDateTime(savedBooking.getEndDateTime());
-        response.setStartLocation(savedBooking.getStartLocation());
-        response.setDestination(savedBooking.getDestination());
-        response.setPassengerCount(savedBooking.getPassengerCount());
-        response.setEstimatedCost(savedBooking.getEstimatedCost());
-        response.setFinalPrice(savedBooking.getFinalPrice());
-        response.setStatus(savedBooking.getStatus());
-        response.setCreatedAt(savedBooking.getCreatedAt());
-
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(response);
+                .body(toResponse(savedBooking));
     }
 
 
@@ -145,20 +156,49 @@ public class BookingController {
     public ResponseEntity<BookingResponse> getBooking(
             @PathVariable Integer bookingId) {
 
+        Booking booking = bookingService.getBooking(bookingId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Booking not found")
+                );
+
+        return ResponseEntity.ok(toResponse(booking));
+    }
 
 
-        return ResponseEntity.ok(
-                toResponse(bookingService.getBooking(bookingId)
-                        .orElseThrow(()-> new ResourceNotFoundException("Booking not found")))
-        );
+    /**
+     * Update customer/trip details of a booking.
+     */
+    @PutMapping("/{bookingId}")
+    public ResponseEntity<BookingResponse> updateBooking(
+            @PathVariable Integer bookingId,
+            @Valid @RequestBody BookingRequest request) {
+
+        Booking booking = new Booking();
+
+        // Customer Details
+        booking.setCustomerFirstName(request.getCustomerFirstName());
+        booking.setCustomerLastName(request.getCustomerLastName());
+        booking.setCustomerContactPhone(request.getCustomerContactPhone());
+        booking.setCustomerContactEmail(request.getCustomerContactEmail());
+        booking.setCustomerAddress(request.getCustomerAddress());
+        booking.setCustomerCity(request.getCustomerCity());
+
+        // Trip Details
+        booking.setStartDateTime(request.getStartDateTime());
+        booking.setEndDateTime(request.getEndDateTime());
+        booking.setStartLocation(request.getStartLocation());
+        booking.setDestination(request.getDestination());
+        booking.setPassengerCount(request.getPassengerCount());
+
+        Booking updatedBooking =
+                bookingService.updateBooking(bookingId, booking);
+
+        return ResponseEntity.ok(toResponse(updatedBooking));
     }
 
 
     /**
      * Check which buses are available for the requested period.
-     *
-     * This is used by the frontend before creating/confirming
-     * a booking.
      */
     @GetMapping("/available-buses")
     public ResponseEntity<?> getAvailableBuses(
@@ -180,9 +220,6 @@ public class BookingController {
 
     /**
      * Customer makes the advance payment for a booking.
-     *
-     * Usually the frontend would call this after the owner
-     * has enabled payment.
      */
     @PostMapping("/{bookingId}/payment")
     public ResponseEntity<?> makePayment(
@@ -217,17 +254,18 @@ public class BookingController {
     public ResponseEntity<BookingResponse> getBookingForOwner(
             @PathVariable Integer bookingId) {
 
-        return ResponseEntity.ok(
-                toResponse(bookingService.getBooking(bookingId))
-                        .orElseThrow(()-> new ResourceNotFoundException("Booking not found"))
-        );
+        Booking booking = bookingService.getBooking(bookingId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Booking not found")
+                );
+
+        return ResponseEntity.ok(toResponse(booking));
     }
 
 
     /**
-     * Owner selects a bus and sets the final price.
-     *
-     * This also enables payment for the customer.
+     * Owner sets the final price.
+     * This enables payment for the customer.
      */
     @PutMapping("/{bookingId}/price")
     public ResponseEntity<BookingResponse> setBookingPrice(
@@ -235,46 +273,63 @@ public class BookingController {
             @RequestParam BigDecimal price) {
 
         return ResponseEntity.ok(
-                toResponse(bookingService.setBookingPrice(bookingId, price))
+                toResponse(
+                        bookingService.setBookingPrice(bookingId, price)
+                )
         );
     }
 
+
+    /**
+     * Owner assigns a bus to the booking.
+     */
     @PutMapping("/{bookingId}/bus")
     public ResponseEntity<BookingResponse> setBookingBus(
             @PathVariable Integer bookingId,
             @RequestParam String busRegistrationNo) {
 
         return ResponseEntity.ok(
-                toResponse(bookingService.assignBus(bookingId, busRegistrationNo))
+                toResponse(
+                        bookingService.assignBus(
+                                bookingId,
+                                busRegistrationNo
+                        )
+                )
         );
     }
 
 
+    /**
+     * Owner assigns a driver to the booking.
+     */
     @PutMapping("/{bookingId}/driver")
-    public ResponseEntity<BookingResponse> setBookingPrice(
+    public ResponseEntity<BookingResponse> setBookingDriver(
             @PathVariable Integer bookingId,
-            @RequestParam String busRegistrationNo,
-            @RequestParam double price) {
+            @RequestParam String driverID) {
 
         return ResponseEntity.ok(
-                toResponse(bookingService.assignDriver(
-                        bookingId,
-                        busRegistrationNo
-                ))
+                toResponse(
+                        bookingService.assignDriver(
+                                bookingId,
+                                driverID
+                        )
+                )
         );
     }
+
 
     /**
      * Owner confirms the booking after customer payment.
-     *
-     * This is where the BookingService can create the actual Journey.
+     * BookingService can create the actual Journey here.
      */
     @PostMapping("/{bookingId}/confirm")
     public ResponseEntity<BookingResponse> confirmBooking(
             @PathVariable Integer bookingId) {
 
         return ResponseEntity.ok(
-                toResponse(bookingService.confirmBooking(bookingId))
+                toResponse(
+                        bookingService.confirmBooking(bookingId)
+                )
         );
     }
 
@@ -287,9 +342,12 @@ public class BookingController {
             @PathVariable Integer bookingId) {
 
         return ResponseEntity.ok(
-                toResponse(bookingService.rejectBooking(bookingId))
+                toResponse(
+                        bookingService.rejectBooking(bookingId)
+                )
         );
     }
+
 
     /**
      * Cancel a booking.
@@ -299,7 +357,9 @@ public class BookingController {
             @PathVariable Integer bookingId) {
 
         return ResponseEntity.ok(
-                toResponse(bookingService.cancelBooking(bookingId))
+                toResponse(
+                        bookingService.cancelBooking(bookingId)
+                )
         );
     }
 }

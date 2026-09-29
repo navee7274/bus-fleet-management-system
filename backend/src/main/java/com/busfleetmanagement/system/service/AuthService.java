@@ -4,6 +4,7 @@ import com.busfleetmanagement.system.dto.LoginRequest;
 import com.busfleetmanagement.system.dto.LoginResponse;
 import com.busfleetmanagement.system.entity.Owner;
 import com.busfleetmanagement.system.repository.OwnerRepository;
+import com.busfleetmanagement.system.security.SessionManager;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -12,9 +13,14 @@ import java.util.Optional;
 public class AuthService {
 
     private final OwnerRepository ownerRepository;
+    private final SessionManager sessionManager;
 
-    public AuthService(OwnerRepository ownerRepository) {
+    public AuthService(
+            OwnerRepository ownerRepository,
+            SessionManager sessionManager
+    ) {
         this.ownerRepository = ownerRepository;
+        this.sessionManager = sessionManager;
     }
 
     public LoginResponse login(LoginRequest request) {
@@ -32,11 +38,15 @@ public class AuthService {
             throw new RuntimeException("Invalid username or password");
         }
 
+        // Create server-side session
+        String sessionId = sessionManager.createSession(owner.getOwnerId());
+
         return new LoginResponse(
                 "Login successful",
                 owner.getOwnerId(),
                 owner.getUsername(),
-                owner.getName()
+                owner.getName(),
+                sessionId
         );
     }
 }
