@@ -4,9 +4,12 @@ import com.busfleetmanagement.system.entity.Driver;
 import com.busfleetmanagement.system.entity.MaintenanceLog;
 import com.busfleetmanagement.system.repository.DriverRepository;
 import com.busfleetmanagement.system.repository.MaintenanceLogRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+
+@Service
 
 public class DriverService {
     private final DriverRepository DriverRepository;
