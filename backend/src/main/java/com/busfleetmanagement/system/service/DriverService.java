@@ -16,17 +16,17 @@ public class DriverService {
     }
 
     //CREAT DRIVER RECORD
-    public Driver creatDriverRecord(Driver driver) {
+    public Driver creatDriver(Driver driver) {
         return DriverRepository.save(driver);
     }
 
     // READ ALL Driver RECORDS
-    public List<Driver> getAllDriverRecords() {
+    public List<Driver> getAllDriver() {
         return DriverRepository.findAll();
     }
 
     // READ ONLY ONE Driver RECORD
-    public Optional<Driver> getDriverRecordById(String DriverID) {
+    public Optional<Driver> getDriverById(String DriverID) {
         return DriverRepository.findById(DriverID);
     }
 
@@ -44,6 +44,18 @@ public class DriverService {
         existingRecord.setPerTripAllowence(driver.getPerTripAllowence());
         existingRecord.setNotes(driver.getNotes());
         existingRecord.setDActive(driver.isDActive());
+
+        return DriverRepository.save(existingRecord);
+    }
+
+    // DEACTIVATE DRIVER
+    public Driver deactivateDriver(String DriverID) {
+
+        Driver existingRecord = DriverRepository.findById(DriverID)
+                .orElseThrow(() ->
+                        new RuntimeException("Driver record not found"));
+
+        existingRecord.setDActive(false);
 
         return DriverRepository.save(existingRecord);
     }
