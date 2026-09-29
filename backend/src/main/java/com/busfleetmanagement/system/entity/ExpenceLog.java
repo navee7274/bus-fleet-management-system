@@ -10,14 +10,14 @@ import java.util.Date;
 @Table(name = "ExpenceLog")
 @Access(AccessType.FIELD)
 
-public class ExpenseLog {
+public class ExpenceLog {
 
     @Id
-    @Column(name = "ExpenseID", nullable = false, unique = true, length = 10)
-    private int expenseID;
+    @Column(name = "ExpenceID", nullable = false, unique = true, length = 10)
+    private int expenceID;
 
-    @Column(name = "ExpenseDate", nullable = false, unique = false, length = 10)
-    private LocalDate expensedate;
+    @Column(name = "ExpenceDate", nullable = false, unique = false, length = 10)
+    private LocalDate expencedate;
 
     @ManyToOne
     @JoinColumn(name = "BRegistrationNo", referencedColumnName = "BRegistrationNo")
@@ -33,23 +33,23 @@ public class ExpenseLog {
     private BigDecimal amount;
 
     @Column(name = "ExpenseDescription", nullable = true, unique = false, length = 15)
-    private String expenseDescription;
+    private String expenceDescription;
 
-    public ExpenseLog(){
+    public ExpenceLog(){
     }
 
-    public int getExpenseID() {
-        return expenseID;
+    public int getExpenceID() {
+        return expenceID;
     }
 
-    public void setExpenseID(int expenseID) {
-        this.expenseID = expenseID;
+    public void setExpenceID(int expenceID) {
+        this.expenceID = expenceID;
     }
 
-    public LocalDate getExpensedate() {return expensedate;}
+    public LocalDate getExpencedate() {return expencedate;}
 
-    public void setExpensedate(LocalDate expensedate) {
-        this.expensedate = expensedate;
+    public void setExpencedate(LocalDate expencedate) {
+        this.expencedate = expencedate;
     }
 
     public Bus getBus() {
@@ -76,12 +76,12 @@ public class ExpenseLog {
         this.amount = amount;
     }
 
-    public String getExpenseDescription() {
-        return expenseDescription;
+    public String getExpenceDescription() {
+        return expenceDescription;
     }
 
-    public void setExpenseDescription(String expenseDescription) {
-        this.expenseDescription = expenseDescription;
+    public void setExpenceDescription(String expenceDescription) {
+        this.expenceDescription = expenceDescription;
     }
 
     public String getPaymentMethod() {
