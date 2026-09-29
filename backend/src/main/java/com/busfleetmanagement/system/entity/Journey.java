@@ -39,7 +39,7 @@ public class Journey {
     @Column(name = "EndOdometer", nullable = false, unique = true, length = 20)
     private BigDecimal endOdometer;
 
-    @Column(name = "KMTraveled", nullable = false, unique = true, length = 10)
+    @Column(name = "KMTravelled", nullable = false, unique = true, length = 10)
     private BigDecimal kmTraveled;
 
     @Column(name = "IncomeAmount", nullable = false, unique = false, length = 10)
