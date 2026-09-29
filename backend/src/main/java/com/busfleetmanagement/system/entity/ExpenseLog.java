@@ -3,6 +3,7 @@ package com.busfleetmanagement.system.entity;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -16,7 +17,7 @@ public class ExpenseLog {
     private int expenseID;
 
     @Column(name = "ExpenseDate", nullable = false, unique = false, length = 10)
-    private Date expensedate;
+    private LocalDate expensedate;
 
     @ManyToOne
     @JoinColumn(name = "BRegistrationNo", referencedColumnName = "BRegistrationNo")
@@ -45,11 +46,9 @@ public class ExpenseLog {
         this.expenseID = expenseID;
     }
 
-    public Date getExpensedate() {
-        return expensedate;
-    }
+    public LocalDate getExpensedate() {return expensedate;}
 
-    public void setExpensedate(Date expensedate) {
+    public void setExpensedate(LocalDate expensedate) {
         this.expensedate = expensedate;
     }
 
