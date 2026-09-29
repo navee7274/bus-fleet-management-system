@@ -9,18 +9,5 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface JourneyRepository extends JpaRepository<Journey,Integer> {
-    List<Journey>
-    findByBusAndStartDateTimeLessThanAndEndDateTimeGreaterThan(
-            Bus bus,
-            LocalDateTime endDateTime,
-            LocalDateTime startDateTime
-    );
-
-    List<Journey>
-    findByDriverAndStartDateTimeLessThanAndEndDateTimeGreaterThan(
-            Driver driver,
-            LocalDateTime endDateTime,
-            LocalDateTime startDateTime
-    );
 }
 
