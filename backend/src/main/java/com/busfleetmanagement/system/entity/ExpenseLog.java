@@ -1,12 +1,13 @@
 package com.busfleetmanagement.system.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.util.Date;
+
+@Entity
+@Table(name = "ExpenseLog")
+@Access(AccessType.FIELD)
 
 public class ExpenseLog {
 
