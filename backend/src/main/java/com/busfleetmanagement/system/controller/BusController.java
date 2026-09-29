@@ -1,14 +1,15 @@
 package com.busfleetmanagement.system.controller;
 
+import com.busfleetmanagement.system.dto.BusRequest;
+import com.busfleetmanagement.system.dto.BusResponse;
 import com.busfleetmanagement.system.entity.Bus;
 import com.busfleetmanagement.system.exception.ResourceNotFoundException;
 import com.busfleetmanagement.system.service.BusService;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.busfleetmanagement.system.dto.BusResponse;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/bus")
@@ -21,6 +22,7 @@ public class BusController {
         this.busService = busService;
     }
 
+    // CONVERT BUS TO BUS RESPONSE
     private BusResponse toResponse(Bus bus) {
 
         BusResponse response = new BusResponse();
@@ -35,32 +37,48 @@ public class BusController {
         return response;
     }
 
-    private Optional<BusResponse> toResponse(Optional<Bus> bus) {
-        return bus.map(this::toResponse);
+    // CONVERT BUS REQUEST TO BUS ENTITY
+    private Bus toEntity(BusRequest request) {
+
+        Bus bus = new Bus();
+
+        bus.setBusRegistrationNo(request.getBusRegistrationNo());
+        bus.setPurchaseDate(request.getPurchaseDate());
+        bus.setPurchasePrice(request.getPurchasePrice());
+        bus.setCapacity(request.getCapacity());
+        bus.setNotes(request.getNotes());
+        bus.setActive(request.isActive());
+
+        return bus;
     }
 
-    private List<BusResponse> toResponse(List<Bus> buses) {
-        return buses.stream()
+    // ADDING A BUS
+    @PostMapping
+    public ResponseEntity<BusResponse> createBus(
+            @RequestBody BusRequest request) {
+
+        Bus bus = toEntity(request);
+
+        Bus savedBus = busService.creatBus(bus);
+
+        return ResponseEntity.ok(toResponse(savedBus));
+    }
+
+    // GET ALL BUSES
+    @GetMapping
+    public ResponseEntity<List<BusResponse>> getAllBus() {
+
+        List<BusResponse> buses = busService.getAllBuses()
+                .stream()
                 .map(this::toResponse)
                 .toList();
+
+        return ResponseEntity.ok(buses);
     }
 
-    //ADDING A BUS..................................
-    @PostMapping
-    public ResponseEntity<Bus> creatBus(@RequestBody Bus bus) {
-        Bus savedBus = busService.creatBus(bus);
-        return ResponseEntity.ok(savedBus);
-    }
-
-    //GET ALL BUSSES................................
-    @GetMapping
-    public ResponseEntity<List<Bus>> getAllBus() {
-        return ResponseEntity.ok(busService.getAllBuses());
-    }
-
-    //GET BUS BY REGISTRATION NUMBER................
+    // GET BUS BY REGISTRATION NUMBER
     @GetMapping("/{BRegistrationNo}")
-    public ResponseEntity<Bus> getBusById(
+    public ResponseEntity<BusResponse> getBusById(
             @PathVariable String BRegistrationNo) {
 
         Bus bus = busService.getBusById(BRegistrationNo)
@@ -68,26 +86,29 @@ public class BusController {
                         () -> new ResourceNotFoundException("Bus not found")
                 );
 
-        return ResponseEntity.ok(bus);
+        return ResponseEntity.ok(toResponse(bus));
     }
 
-    //UPDATE BUS DETAILS...........................
+    // UPDATE BUS DETAILS
     @PutMapping("/{BRegistrationNo}")
-    public ResponseEntity<Bus> updateBus(
+    public ResponseEntity<BusResponse> updateBus(
             @PathVariable String BRegistrationNo,
-            @RequestBody Bus bus) {
-        return ResponseEntity.ok(
-                busService.updateBus(BRegistrationNo, bus)
-        );
-    }
-    //DEACTIVATE BUS..............................
-    @PatchMapping("/{BRegistrationNo}/deactivate")
-    public ResponseEntity<Bus> deactivateBus(
-            @PathVariable String BRegistrationNo){
-            return ResponseEntity.ok(
-                    busService.deactivateBus(BRegistrationNo)
-            );
+            @RequestBody BusRequest request) {
 
+        Bus bus = toEntity(request);
+
+        Bus updatedBus = busService.updateBus(BRegistrationNo, bus);
+
+        return ResponseEntity.ok(toResponse(updatedBus));
+    }
+
+    // DEACTIVATE BUS
+    @PatchMapping("/{BRegistrationNo}/deactivate")
+    public ResponseEntity<BusResponse> deactivateBus(
+            @PathVariable String BRegistrationNo) {
+
+        Bus bus = busService.deactivateBus(BRegistrationNo);
+
+        return ResponseEntity.ok(toResponse(bus));
     }
 }
-
