@@ -15,11 +15,23 @@ public class Booking {
     @Column(name = "BookingID", nullable = false, unique = true)
     private int BookingID;
 
-    @Column(name = "CustomerName", nullable = false, length = 20)
-    private String CustomerName;
+    @Column(name = "CustomerFirstName", nullable = false, length = 20)
+    private String CustomerFirstName;
 
-    @Column(name = "CustomerContact",  nullable = false, length = 10)
-    private String CustomerContact;
+    @Column(name = "CustomerLastName", nullable = false, length = 20)
+    private String CustomerLastName;
+
+    @Column(name = "CustomerContactPhone",  nullable = false, length = 10)
+    private String CustomerContactPhone;
+
+    @Column(name = "CustomerContactEmail",  nullable = false, length = 70)
+    private String CustomerContactEmail;
+
+    @Column(name = "CustomerAddress",  nullable = false, length = 100)
+    private String CustomerAddress;
+
+    @Column(name = "CustomerCity",  nullable = false, length = 50)
+    private String CustomerCity;
 
     @Column(name = "StartDateTime",  nullable = false)
     private LocalDateTime StartDateTime;
@@ -50,6 +62,9 @@ public class Booking {
     @Column(name = "FinalPrice", nullable = true)
     private BigDecimal FinalPrice;
 
+    @Column(name = "AdvanceAmount", nullable = false)
+    private BigDecimal AdvanceAmount = BigDecimal.valueOf(8000.00);
+
     @Enumerated(EnumType.STRING)
     @Column(name = "BookingStatus", nullable = false, length = 30)
     private BookingStatus Status;
@@ -61,6 +76,19 @@ public class Booking {
     @JoinColumn(name = "JourneyID", referencedColumnName = "JourneyID")
     private Journey journey;
 
+    @PrePersist
+    protected void onCreate() {
+        CreatedAt = LocalDateTime.now();
+
+        if (Status == null) {
+            Status = BookingStatus.PENDING;
+        }
+
+        if (AdvanceAmount == null) {
+            AdvanceAmount = BigDecimal.valueOf(8000.00);
+        }
+    }
+
     public Booking(){
     }
 
@@ -70,22 +98,6 @@ public class Booking {
 
     public void setBookingID(int bookingID) {
         BookingID = bookingID;
-    }
-
-    public String getCustomerName() {
-        return CustomerName;
-    }
-
-    public void setCustomerName(String customerName) {
-        CustomerName = customerName;
-    }
-
-    public String getCustomerContact() {
-        return CustomerContact;
-    }
-
-    public void setCustomerContact(String customerContact) {
-        CustomerContact = customerContact;
     }
 
     public LocalDateTime getStartDateTime() {
@@ -180,5 +192,61 @@ public class Booking {
 
     public void setJourney(Journey journey) {
         this.journey = journey;
+    }
+
+    public String getCustomerFirstName() {
+        return CustomerFirstName;
+    }
+
+    public void setCustomerFirstName(String customerFirstName) {
+        CustomerFirstName = customerFirstName;
+    }
+
+    public String getCustomerLastName() {
+        return CustomerLastName;
+    }
+
+    public void setCustomerLastName(String customerLastName) {
+        CustomerLastName = customerLastName;
+    }
+
+    public String getCustomerContactPhone() {
+        return CustomerContactPhone;
+    }
+
+    public void setCustomerContactPhone(String customerContactPhone) {
+        CustomerContactPhone = customerContactPhone;
+    }
+
+    public String getCustomerContactEmail() {
+        return CustomerContactEmail;
+    }
+
+    public void setCustomerContactEmail(String customerContactEmail) {
+        CustomerContactEmail = customerContactEmail;
+    }
+
+    public String getCustomerAddress() {
+        return CustomerAddress;
+    }
+
+    public void setCustomerAddress(String customerAddress) {
+        CustomerAddress = customerAddress;
+    }
+
+    public String getCustomerCity() {
+        return CustomerCity;
+    }
+
+    public void setCustomerCity(String customerCity) {
+        CustomerCity = customerCity;
+    }
+
+    public BigDecimal getAdvanceAmount() {
+        return AdvanceAmount;
+    }
+
+    public void setAdvanceAmount(BigDecimal advanceAmount) {
+        AdvanceAmount = advanceAmount;
     }
 }

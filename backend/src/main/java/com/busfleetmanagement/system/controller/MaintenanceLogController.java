@@ -1,4 +1,4 @@
 package com.busfleetmanagement.system.controller;
 
-public class MaintenanceController {
+public class MaintenanceLogController {
 }

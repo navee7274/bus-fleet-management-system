@@ -9,9 +9,15 @@ public class BookingResponse {
 
     private int bookingID;
 
-    private String customerName;
-    private String customerContact;
+    // Customer Details
+    private String customerFirstName;
+    private String customerLastName;
+    private String customerContactPhone;
+    private String customerContactEmail;
+    private String customerAddress;
+    private String customerCity;
 
+    // Booking Details
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
 
@@ -20,12 +26,16 @@ public class BookingResponse {
 
     private int passengerCount;
 
+    // Assigned Resources
     private String busRegistrationNo;
     private String driverID;
 
+    // Pricing
     private BigDecimal estimatedCost;
     private BigDecimal finalPrice;
+    private BigDecimal advanceAmount;
 
+    // Status
     private BookingStatus status;
 
     private LocalDateTime createdAt;
@@ -33,6 +43,7 @@ public class BookingResponse {
     private Integer journeyID;
 
 
+    // Booking ID
     public int getBookingID() {
         return bookingID;
     }
@@ -41,22 +52,68 @@ public class BookingResponse {
         this.bookingID = bookingID;
     }
 
-    public String getCustomerName() {
-        return customerName;
+
+    // Customer First Name
+    public String getCustomerFirstName() {
+        return customerFirstName;
     }
 
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
+    public void setCustomerFirstName(String customerFirstName) {
+        this.customerFirstName = customerFirstName;
     }
 
-    public String getCustomerContact() {
-        return customerContact;
+
+    // Customer Last Name
+    public String getCustomerLastName() {
+        return customerLastName;
     }
 
-    public void setCustomerContact(String customerContact) {
-        this.customerContact = customerContact;
+    public void setCustomerLastName(String customerLastName) {
+        this.customerLastName = customerLastName;
     }
 
+
+    // Customer Phone
+    public String getCustomerContactPhone() {
+        return customerContactPhone;
+    }
+
+    public void setCustomerContactPhone(String customerContactPhone) {
+        this.customerContactPhone = customerContactPhone;
+    }
+
+
+    // Customer Email
+    public String getCustomerContactEmail() {
+        return customerContactEmail;
+    }
+
+    public void setCustomerContactEmail(String customerContactEmail) {
+        this.customerContactEmail = customerContactEmail;
+    }
+
+
+    // Customer Address
+    public String getCustomerAddress() {
+        return customerAddress;
+    }
+
+    public void setCustomerAddress(String customerAddress) {
+        this.customerAddress = customerAddress;
+    }
+
+
+    // Customer City
+    public String getCustomerCity() {
+        return customerCity;
+    }
+
+    public void setCustomerCity(String customerCity) {
+        this.customerCity = customerCity;
+    }
+
+
+    // Start Date/Time
     public LocalDateTime getStartDateTime() {
         return startDateTime;
     }
@@ -65,6 +122,8 @@ public class BookingResponse {
         this.startDateTime = startDateTime;
     }
 
+
+    // End Date/Time
     public LocalDateTime getEndDateTime() {
         return endDateTime;
     }
@@ -73,6 +132,8 @@ public class BookingResponse {
         this.endDateTime = endDateTime;
     }
 
+
+    // Start Location
     public String getStartLocation() {
         return startLocation;
     }
@@ -81,6 +142,8 @@ public class BookingResponse {
         this.startLocation = startLocation;
     }
 
+
+    // Destination
     public String getDestination() {
         return destination;
     }
@@ -89,6 +152,8 @@ public class BookingResponse {
         this.destination = destination;
     }
 
+
+    // Passenger Count
     public int getPassengerCount() {
         return passengerCount;
     }
@@ -97,6 +162,8 @@ public class BookingResponse {
         this.passengerCount = passengerCount;
     }
 
+
+    // Bus Registration Number
     public String getBusRegistrationNo() {
         return busRegistrationNo;
     }
@@ -105,6 +172,8 @@ public class BookingResponse {
         this.busRegistrationNo = busRegistrationNo;
     }
 
+
+    // Driver ID
     public String getDriverID() {
         return driverID;
     }
@@ -113,6 +182,8 @@ public class BookingResponse {
         this.driverID = driverID;
     }
 
+
+    // Estimated Cost
     public BigDecimal getEstimatedCost() {
         return estimatedCost;
     }
@@ -121,6 +192,8 @@ public class BookingResponse {
         this.estimatedCost = estimatedCost;
     }
 
+
+    // Final Price
     public BigDecimal getFinalPrice() {
         return finalPrice;
     }
@@ -129,6 +202,18 @@ public class BookingResponse {
         this.finalPrice = finalPrice;
     }
 
+
+    // Advance Amount
+    public BigDecimal getAdvanceAmount() {
+        return advanceAmount;
+    }
+
+    public void setAdvanceAmount(BigDecimal advanceAmount) {
+        this.advanceAmount = advanceAmount;
+    }
+
+
+    // Status
     public BookingStatus getStatus() {
         return status;
     }
@@ -137,6 +222,8 @@ public class BookingResponse {
         this.status = status;
     }
 
+
+    // Created At
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -145,6 +232,8 @@ public class BookingResponse {
         this.createdAt = createdAt;
     }
 
+
+    // Journey ID
     public Integer getJourneyID() {
         return journeyID;
     }

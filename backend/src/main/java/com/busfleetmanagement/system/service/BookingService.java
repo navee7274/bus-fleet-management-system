@@ -26,14 +26,48 @@ public class BookingService {
     private DriverRepository driverRepository;
     private PaymentRepository paymentRepository;
 
-    private BigDecimal advanceAmountPerBooking = BigDecimal.valueOf(5000.00);
-
     public BookingService(BookingRepository bookingRepository){
         this.bookingRepository = bookingRepository;
     }
 
+    // VALIDATE PHONE NUMBER
+    private void validatePhoneNumber(String phone){
+        if (phone == null || phone.isBlank()) {
+            throw new IllegalArgumentException("Phone number is required");
+        }
+
+        if (!phone.matches("^(07\\d{8}|\\+947\\d{8})$")) {
+            throw new IllegalArgumentException(
+                    "Invalid Sri Lankan phone number. Use 07XXXXXXXX or +947XXXXXXXX"
+            );
+        }
+    }
+
+    // VALIDATE EMAIL ADDRESS
+    private void validateEmail(String email) {
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("Email is required");
+        }
+
+        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+            throw new IllegalArgumentException("Invalid email address");
+        }
+    }
+
+    // VALIDATE ALL VALUES
+    private void validateAll(Booking booking){
+        String phone = booking.getCustomerContactPhone();
+        String email = booking.getCustomerContactEmail();
+
+        validateEmail(email);
+        validatePhoneNumber(phone);
+    }
+
     // CREATE BOOKING
     public Booking createBooking(Booking booking){
+        // VALIDATING CUSTOMER DETAILS
+        validateAll(booking);
+
         return bookingRepository.save(booking);
     }
 
@@ -43,24 +77,28 @@ public class BookingService {
     }
 
     // UPDATE BOOKING
-    public Booking updateBooking(int BookingId, Booking booking){
+    public Booking updateBooking(int BookingId, Booking booking) {
 
         Booking existingBooking = bookingRepository.findById(BookingId)
-                .orElseThrow(()-> new RuntimeException("Booking not found"));
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        existingBooking.setCustomerName(booking.getCustomerName());
-        existingBooking.setCustomerContact(booking.getCustomerContact());
+        // Validate updated customer/trip details
+        validateAll(booking);
+
+        // Customer details
+        existingBooking.setCustomerFirstName(booking.getCustomerFirstName());
+        existingBooking.setCustomerLastName(booking.getCustomerLastName());
+        existingBooking.setCustomerContactPhone(booking.getCustomerContactPhone());
+        existingBooking.setCustomerContactEmail(booking.getCustomerContactEmail());
+        existingBooking.setCustomerAddress(booking.getCustomerAddress());
+        existingBooking.setCustomerCity(booking.getCustomerCity());
+
+        // Journey details
         existingBooking.setStartDateTime(booking.getStartDateTime());
         existingBooking.setEndDateTime(booking.getEndDateTime());
         existingBooking.setStartLocation(booking.getStartLocation());
         existingBooking.setDestination(booking.getDestination());
         existingBooking.setPassengerCount(booking.getPassengerCount());
-        existingBooking.setBus(booking.getBus());
-        existingBooking.setDriver(booking.getDriver());
-        existingBooking.setEstimatedCost(booking.getEstimatedCost());
-        existingBooking.setFinalPrice(booking.getFinalPrice());
-        existingBooking.setStatus(booking.getStatus());
-        existingBooking.setCreatedAt(booking.getCreatedAt());
 
         return bookingRepository.save(existingBooking);
     }
@@ -175,7 +213,7 @@ public class BookingService {
 
         Payment payment = new Payment();
         payment.setBooking(booking);
-        payment.setAmount(advanceAmountPerBooking);
+        payment.setAmount(booking.getAdvanceAmount());
         payment.setPaymentDate(LocalDateTime.now());
         payment.setPaymentStatus(PaymentStatus.SUCCESS);
 
