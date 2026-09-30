@@ -31,7 +31,12 @@ public class AuthFilter extends OncePerRequestFilter {
         String requestURI = request.getRequestURI();
 
         // Allow login without authentication
-        if (requestURI.equals("/api/auth/login")) {
+        if (requestURI.equals("/api/auth/login") || requestURI.equals("/api/availability/buses")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if (requestURI.equals("/api/bookings") && "POST".equals(request.getMethod())) {
             filterChain.doFilter(request, response);
             return;
         }

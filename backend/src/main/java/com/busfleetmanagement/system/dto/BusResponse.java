@@ -5,7 +5,7 @@ import java.time.LocalDate;
 
 public class BusResponse {
 
-    private String busRegistrationNo;
+    private String bRegistrationNo;
     private LocalDate purchaseDate;
     private BigDecimal purchasePrice;
     private Integer capacity;
@@ -18,11 +18,11 @@ public class BusResponse {
     // Getters and Setters
 
     public String getBusRegistrationNo() {
-        return busRegistrationNo;
+        return bRegistrationNo;
     }
 
-    public void setBusRegistrationNo(String busRegistrationNo) {
-        this.busRegistrationNo = busRegistrationNo;
+    public void setBusRegistrationNo(String bRegistrationNo) {
+        this.bRegistrationNo = bRegistrationNo;
     }
 
     public LocalDate getPurchaseDate() {

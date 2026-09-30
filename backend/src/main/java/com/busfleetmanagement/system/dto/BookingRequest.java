@@ -12,7 +12,10 @@ import java.time.LocalDateTime;
 
 public class BookingRequest {
 
+    // =========================
     // Customer Details
+    // =========================
+
     @NotBlank
     @Size(max = 20)
     private String customerFirstName;
@@ -22,7 +25,10 @@ public class BookingRequest {
     private String customerLastName;
 
     @NotBlank
-    @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must contain exactly 10 digits")
+    @Pattern(
+            regexp = "^[0-9]{10}$",
+            message = "Phone number must contain exactly 10 digits"
+    )
     private String customerContactPhone;
 
     @NotBlank
@@ -39,13 +45,16 @@ public class BookingRequest {
     private String customerCity;
 
 
+    // =========================
     // Booking Details
+    // =========================
+
     @NotNull
-    @Future
+    @Future(message = "Start date and time must be in the future")
     private LocalDateTime startDateTime;
 
     @NotNull
-    @Future
+    @Future(message = "End date and time must be in the future")
     private LocalDateTime endDateTime;
 
     @NotBlank
@@ -60,7 +69,18 @@ public class BookingRequest {
     private int passengerCount;
 
 
+    // =========================
+    // Bus
+    // =========================
+
+    @NotBlank
+    @Size(max = 20)
+    private String busRegistrationNo;
+
+
+    // =========================
     // Getters and Setters
+    // =========================
 
     public String getCustomerFirstName() {
         return customerFirstName;
@@ -148,5 +168,13 @@ public class BookingRequest {
 
     public void setPassengerCount(int passengerCount) {
         this.passengerCount = passengerCount;
+    }
+
+    public String getBusRegistrationNo() {
+        return busRegistrationNo;
+    }
+
+    public void setBusRegistrationNo(String busRegistrationNo) {
+        this.busRegistrationNo = busRegistrationNo;
     }
 }
