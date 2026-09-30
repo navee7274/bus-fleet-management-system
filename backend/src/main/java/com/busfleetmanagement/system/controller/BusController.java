@@ -40,6 +40,7 @@ public class BusController {
     // CONVERT BUS REQUEST TO BUS ENTITY
     private Bus toEntity(BusRequest request) {
 
+        System.out.println("bus toEntity....");
         Bus bus = new Bus();
 
         bus.setBusRegistrationNo(request.getBusRegistrationNo());
@@ -56,6 +57,10 @@ public class BusController {
     @PostMapping
     public ResponseEntity<BusResponse> createBus(
             @RequestBody BusRequest request) {
+
+        System.out.println("REQUEST RECEIVED");
+        System.out.println(request.getBusRegistrationNo());
+
 
         Bus bus = toEntity(request);
 
@@ -90,22 +95,26 @@ public class BusController {
     }
 
     // UPDATE BUS DETAILS
-    @PutMapping("/{BRegistrationNo}")
+    @PutMapping("/{busRegistrationNo}")
     public ResponseEntity<BusResponse> updateBus(
-            @PathVariable String BRegistrationNo,
+            @PathVariable String busRegistrationNo,
             @RequestBody BusRequest request) {
 
         Bus bus = toEntity(request);
 
-        Bus updatedBus = busService.updateBus(BRegistrationNo, bus);
+        System.out.println("bus update requested....");
+
+        Bus updatedBus = busService.updateBus(busRegistrationNo, bus);
 
         return ResponseEntity.ok(toResponse(updatedBus));
     }
 
     // DEACTIVATE BUS
-    @PatchMapping("/{BRegistrationNo}/deactivate")
+    @PutMapping("/{BRegistrationNo}/deactivate")
     public ResponseEntity<BusResponse> deactivateBus(
             @PathVariable String BRegistrationNo) {
+
+        System.out.println("bus deactivation requested for " + BRegistrationNo + " ....");
 
         Bus bus = busService.deactivateBus(BRegistrationNo);
 
