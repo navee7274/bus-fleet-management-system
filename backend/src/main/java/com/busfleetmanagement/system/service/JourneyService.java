@@ -36,8 +36,7 @@ public class JourneyService {
 
     //Get journey by ID
     public Journey getJourneyById(int journeyID){
-        return journeyRepository.findById(journeyID)
-                .orElseThrow(() ->
+        return journeyRepository.findById(journeyID).orElseThrow(() ->
                         new RuntimeException("Journey not found with ID: " + journeyID));
     }
     //Create a new journey
@@ -49,9 +48,7 @@ public class JourneyService {
             throw new RuntimeException("Bus is required");
         }
 
-        Bus bus = busRepository
-                .findById(journey.getBus().getBusRegistrationNo())
-                .orElseThrow(() ->
+        Bus bus = busRepository.findById(journey.getBus().getBusRegistrationNo()).orElseThrow(() ->
                         new RuntimeException("Bus not found"));
 
         //Check driver
@@ -60,9 +57,7 @@ public class JourneyService {
             throw new RuntimeException("Driver is required");
         }
 
-        Driver driver = driverRepository
-                .findById(journey.getDriver().getDriverID())
-                .orElseThrow(() ->
+        Driver driver = driverRepository.findById(journey.getDriver().getDriverID()).orElseThrow(() ->
                         new RuntimeException("Driver not found"));
 
         //Validate odometer readings
