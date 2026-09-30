@@ -30,10 +30,8 @@ public class FuelLogService {
 
     // Get fuel log by ID
     public FuelLog getFuelLogById(int fuelLogID) {
-        return fuelLogRepository.findById(fuelLogID)
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "Fuel log not found with ID: " + fuelLogID));
+        return fuelLogRepository.findById(fuelLogID).orElseThrow(() ->
+                        new RuntimeException("Fuel log not found with ID: " + fuelLogID));
     }
 
     // Create a new fuel log
@@ -48,31 +46,24 @@ public class FuelLogService {
         }
 
         // Find bus
-        Bus bus = busRepository
-                .findById(fuelLog.getBus().getBusRegistrationNo())
-                .orElseThrow(() ->
+        Bus bus = busRepository.findById(fuelLog.getBus().getBusRegistrationNo()).orElseThrow(() ->
                         new RuntimeException("Bus not found"));
 
         // Validate fuel price
-        if (fuelLog.getfPrice() == null ||
-                fuelLog.getfPrice().compareTo(BigDecimal.ZERO) <= 0) {
+        if (fuelLog.getfPrice() == null || fuelLog.getfPrice().compareTo(BigDecimal.ZERO) <= 0) {
 
-            throw new RuntimeException(
-                    "Fuel price must be greater than zero");
+            throw new RuntimeException("Fuel price must be greater than zero");
         }
 
         // Validate liters
         if (fuelLog.getfLitersfilled() == null ||
                 fuelLog.getfLitersfilled().compareTo(BigDecimal.ZERO) <= 0) {
 
-            throw new RuntimeException(
-                    "Fuel liters must be greater than zero");
+            throw new RuntimeException("Fuel liters must be greater than zero");
         }
 
         // Calculate fuel cost
-        BigDecimal fuelCost =
-                fuelLog.getfPrice()
-                        .multiply(fuelLog.getfLitersfilled());
+        BigDecimal fuelCost = fuelLog.getfPrice().multiply(fuelLog.getfLitersfilled());
 
         fuelLog.setfCost(fuelCost);
 
@@ -88,50 +79,38 @@ public class FuelLogService {
             FuelLog fuelLog) {
 
         // Find existing fuel log
-        FuelLog existingFuelLog =
-                getFuelLogById(fuelLogID);
+        FuelLog existingFuelLog = getFuelLogById(fuelLogID);
 
         // Check bus
-        if (fuelLog.getBus() == null ||
-                fuelLog.getBus().getBusRegistrationNo() == null ||
-                fuelLog.getBus().getBusRegistrationNo().isEmpty()) {
+        if (fuelLog.getBus() == null || fuelLog.getBus().getBusRegistrationNo() == null || fuelLog.getBus().getBusRegistrationNo().isEmpty()) {
 
             throw new RuntimeException("Bus is required");
         }
 
         // Find bus
-        Bus bus = busRepository
-                .findById(fuelLog.getBus().getBusRegistrationNo())
-                .orElseThrow(() ->
+        Bus bus = busRepository.findById(fuelLog.getBus().getBusRegistrationNo()).orElseThrow(() ->
                         new RuntimeException("Bus not found"));
 
         // Validate fuel price
-        if (fuelLog.getfPrice() == null ||
-                fuelLog.getfPrice().compareTo(BigDecimal.ZERO) <= 0) {
+        if (fuelLog.getfPrice() == null || fuelLog.getfPrice().compareTo(BigDecimal.ZERO) <= 0) {
 
-            throw new RuntimeException(
-                    "Fuel price must be greater than zero");
+            throw new RuntimeException("Fuel price must be greater than zero");
         }
 
         // Validate liters
-        if (fuelLog.getfLitersfilled() == null ||
-                fuelLog.getfLitersfilled().compareTo(BigDecimal.ZERO) <= 0) {
+        if (fuelLog.getfLitersfilled() == null || fuelLog.getfLitersfilled().compareTo(BigDecimal.ZERO) <= 0) {
 
-            throw new RuntimeException(
-                    "Fuel liters must be greater than zero");
+            throw new RuntimeException("Fuel liters must be greater than zero");
         }
 
         // Calculate fuel cost
-        BigDecimal fuelCost =
-                fuelLog.getfPrice()
-                        .multiply(fuelLog.getfLitersfilled());
+        BigDecimal fuelCost = fuelLog.getfPrice().multiply(fuelLog.getfLitersfilled());
 
         // Update fields
         existingFuelLog.setBus(bus);
         existingFuelLog.setfDate(fuelLog.getfDate());
         existingFuelLog.setfPrice(fuelLog.getfPrice());
-        existingFuelLog.setfLitersfilled(
-                fuelLog.getfLitersfilled());
+        existingFuelLog.setfLitersfilled(fuelLog.getfLitersfilled());
         existingFuelLog.setfCost(fuelCost);
 
         return fuelLogRepository.save(existingFuelLog);
@@ -140,8 +119,7 @@ public class FuelLogService {
     // Delete fuel log
     public void deleteFuelLog(int fuelLogID) {
 
-        FuelLog fuelLog =
-                getFuelLogById(fuelLogID);
+        FuelLog fuelLog = getFuelLogById(fuelLogID);
 
         fuelLogRepository.delete(fuelLog);
     }

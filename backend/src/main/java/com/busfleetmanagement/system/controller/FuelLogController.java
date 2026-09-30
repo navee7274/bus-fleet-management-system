@@ -43,8 +43,7 @@ public class FuelLogController {
     public ResponseEntity<FuelLog> createFuelLog(
             @RequestBody FuelLog fuelLog) {
 
-        FuelLog createdFuelLog =
-                fuelLogService.createFuelLog(fuelLog);
+        FuelLog createdFuelLog = fuelLogService.createFuelLog(fuelLog);
 
         return new ResponseEntity<>(
                 createdFuelLog,
@@ -58,8 +57,7 @@ public class FuelLogController {
             @PathVariable int fuelLogID,
             @RequestBody FuelLog fuelLog) {
 
-        FuelLog updatedFuelLog =
-                fuelLogService.updateFuelLog(
+        FuelLog updatedFuelLog = fuelLogService.updateFuelLog(
                         fuelLogID,
                         fuelLog
                 );
