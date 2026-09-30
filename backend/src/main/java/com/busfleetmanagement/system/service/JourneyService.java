@@ -110,11 +110,6 @@ public class JourneyService {
             throw new RuntimeException("End odometer cannot be less than start odometer");
         }
 
-        //Recalculate KM travelled
-        BigDecimal kmTravelled = existingJourney.getEndOdometer().subtract(existingJourney.getStartOdometer());
-
-        existingJourney.setKmTraveled(kmTravelled);
-
         //Update bus if supplied
         if(journey.getBus() != null && journey.getBus().getBusRegistrationNo() != null) {
 
