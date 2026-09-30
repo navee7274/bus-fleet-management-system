@@ -17,12 +17,11 @@ SELECT * FROM Driver;
 
 /*sample queries
 Driver table*/
-INSERT INTO Driver
-(DriverID, Name, NIC, ContactNo, BaseMonthlySalary, PerTripAllowence, notes, DActive)
-VALUES
-('D001', 'Kamal Perera', '199012345678', '0771234567', 75000.00, 2500.00, 'Experienced driver', TRUE),
-('D002', 'Nimal Silva', '198912345679', '0712345678', 80000.00, 3000.00, 'Senior driver', TRUE),
-('D003', 'Sunil Fernando', '199112345680', '0763456789', 70000.00, 2000.00, 'New driver', TRUE);
+INSERT INTO Driver (DriverID, Name, NIC, ContactNo, BaseMonthlySalary, PerTripAllowence, notes, DActive) VALUES
+('DRV001', 'Kamal Perera', '198512345678', '0773344556', 65000.00, 2500.00, 'Senior driver, clean record', TRUE),
+('DRV002', 'Sunil Fernando', '198823456789', '0714455667', 60000.00, 2000.00, 'Experienced in hill routes', TRUE),
+('DRV003', 'Nimal Jayasinghe', '199234567890', '0755566778', 58000.00, 2000.00, 'Night shift preferred', TRUE),
+('DRV004', 'Saman Kumara', '199045678901', '0786677889', 62000.00, 2200.00, 'On leave occasionally', TRUE);
 
 -- BUS table.
 CREATE TABLE Bus(
@@ -37,13 +36,14 @@ SELECT *FROM Bus;
 
 /*sample queries
 Bus table*/
-INSERT INTO Bus
-(BRegistrationNo, BPurchaseDate, BPurchasePrice, BCapacity, BNotes, BActive)
-VALUES
-('NB-1234', '2024-05-10', 12500000.00, 45, 'School bus', TRUE),
-('NB-5678', '2023-08-15', 15000000.00, 50, 'Tour bus', TRUE),
-('WP-9012', '2025-01-20', 18000000.00, 55, 'New bus', TRUE);
+INSERT INTO Bus (BRegistrationNo, BPurchaseDate, BPurchasePrice, BCapacity, BNotes, BActive) VALUES
+('ND-4521', '2020-01-15', 8500000.00, 54, 'Leyland Viking - Main Fleet', TRUE),
+('WP-ND-8890', '2021-06-10', 9200000.00, 49, 'AC Luxury Coach', TRUE),
+('NC-5612', '2019-11-01', 7800000.00, 54, 'Leyland Viking - Long Distance', TRUE),
+('SP-6701', '2022-03-20', 10500000.00, 42, 'Super Luxury Tourist Bus', TRUE);
 
+TRUNCATE TABLE Driver;
+TRUNCATE TABLE Bus;
 /* The Final Bus Table 
 BRegistrationNo | BPurchaseDate | BPurchasePrice | BCapacity | BNotes | BActive */
 
