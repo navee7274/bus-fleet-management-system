@@ -31,3 +31,7 @@ BRegistrationNo | BPurchaseDate | BPurchasePrice | BCapacity | BNotes | BActive 
 
 /* The Final Driver Table 
 DriverID | Name | NIC | ContactNo | BaseMonthlySalary | PerTripAllowence | notes | DActive*/
+
+/*sample queries
+Driver table*/
+
