@@ -32,14 +32,10 @@ public class JourneyController {
 
     private Journey convertToEntity(JourneyRequest request) {
 
-        Bus bus = busService
-                .getBusById(request.getBusRegistrationNo())
-                .orElseThrow(() ->
+        Bus bus = busService.getBusById(request.getBusRegistrationNo()).orElseThrow(() ->
                         new RuntimeException("Bus not found"));
 
-        Driver driver = driverService
-                .getDriverById(request.getDriverID())
-                .orElseThrow(() ->
+        Driver driver = driverService.getDriverById(request.getDriverID()).orElseThrow(() ->
                         new RuntimeException("Driver not found"));
 
         Journey journey = new Journey();
@@ -56,12 +52,10 @@ public class JourneyController {
         journey.setNotes(request.getNotes());
 
         // Calculate KM travelled
-        if (request.getStartOdometer() != null &&
-                request.getEndOdometer() != null) {
+        if (request.getStartOdometer() != null && request.getEndOdometer() != null) {
 
-            BigDecimal kmTravelled =
-                    request.getEndOdometer()
-                            .subtract(request.getStartOdometer());
+            BigDecimal kmTravelled = request.getEndOdometer()
+                    .subtract(request.getStartOdometer());
 
             journey.setKmTraveled(kmTravelled);
         }
@@ -92,8 +86,7 @@ public class JourneyController {
     public ResponseEntity<Journey> createJourney(
             @RequestBody JourneyRequest request) {
 
-        Journey journey =
-                journeyService.createJourney(convertToEntity(request));
+        Journey journey = journeyService.createJourney(convertToEntity(request));
 
         return new ResponseEntity<>(
                 journey,
@@ -107,8 +100,7 @@ public class JourneyController {
             @PathVariable int journeyID,
             @RequestBody JourneyRequest request) {
 
-        Journey journey =
-                journeyService.updateJourney(
+        Journey journey = journeyService.updateJourney(
                         journeyID,
                         convertToEntity(request)
                 );

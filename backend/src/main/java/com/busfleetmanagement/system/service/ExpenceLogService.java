@@ -30,32 +30,23 @@ public class ExpenceLogService {
 
     // Get Expence by ID
     public ExpenceLog getExpenceById(int ExpenceID) {
-        return ExpenceLogRepository.findById(ExpenceID)
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "Expence not found with ID: " + ExpenceID));
+        return ExpenceLogRepository.findById(ExpenceID).orElseThrow(() -> new RuntimeException("Expence not found with ID: " + ExpenceID));
     }
 
     // Create a new Expence
     public ExpenceLog createExpence(ExpenceLog ExpenceLog) {
 
         // Check bus
-        if (ExpenceLog.getBus() == null ||
-                ExpenceLog.getBus().getBusRegistrationNo() == null ||
-                ExpenceLog.getBus().getBusRegistrationNo().isEmpty()) {
-
+        if (ExpenceLog.getBus() == null || ExpenceLog.getBus().getBusRegistrationNo() == null || ExpenceLog.getBus().getBusRegistrationNo().isEmpty()) {
             throw new RuntimeException("Bus is required");
         }
 
         // Find bus
-        Bus bus = busRepository
-                .findById(ExpenceLog.getBus().getBusRegistrationNo())
-                .orElseThrow(() ->
+        Bus bus = busRepository.findById(ExpenceLog.getBus().getBusRegistrationNo()).orElseThrow(() ->
                         new RuntimeException("Bus not found"));
 
         // Validate amount
-        if (ExpenceLog.getAmount() == null ||
-                ExpenceLog.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+        if (ExpenceLog.getAmount() == null || ExpenceLog.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
 
             throw new RuntimeException(
                     "Expence amount must be greater than zero");
@@ -91,30 +82,24 @@ public class ExpenceLogService {
                         new RuntimeException("Bus not found"));
 
         // Validate amount
-        if (ExpenceLog.getAmount() == null ||
-                ExpenceLog.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+        if (ExpenceLog.getAmount() == null || ExpenceLog.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
 
             throw new RuntimeException(
                     "Expence amount must be greater than zero");
         }
 
         // Update fields
-        existingExpence.setExpencedate(
-                ExpenceLog.getExpencedate());
+        existingExpence.setExpencedate(ExpenceLog.getExpencedate());
 
         existingExpence.setBus(bus);
 
-        existingExpence.setCategory(
-                ExpenceLog.getCategory());
+        existingExpence.setCategory(ExpenceLog.getCategory());
 
-        existingExpence.setPaymentMethod(
-                ExpenceLog.getPaymentMethod());
+        existingExpence.setPaymentMethod(ExpenceLog.getPaymentMethod());
 
-        existingExpence.setAmount(
-                ExpenceLog.getAmount());
+        existingExpence.setAmount(ExpenceLog.getAmount());
 
-        existingExpence.setExpenceDescription(
-                ExpenceLog.getExpenceDescription());
+        existingExpence.setExpenceDescription(ExpenceLog.getExpenceDescription());
 
         return ExpenceLogRepository.save(existingExpence);
     }
@@ -122,8 +107,7 @@ public class ExpenceLogService {
     // Delete Expence
     public void deleteExpence(int ExpenceID) {
 
-        ExpenceLog ExpenceLog =
-                getExpenceById(ExpenceID);
+        ExpenceLog ExpenceLog = getExpenceById(ExpenceID);
 
         ExpenceLogRepository.delete(ExpenceLog);
     }
