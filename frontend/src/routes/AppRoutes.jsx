@@ -10,6 +10,11 @@ import EditBus from "../pages/buses/EditBus";
 import BusDetails from "../pages/buses/BusDetails";
 import BusLayout from "../components/BusLayout";
 
+import JourneyList from "../pages/journey/JourneyList";
+import JourneyForm from "../pages/journey/JourneyForm";
+import JourneyDetails from "../pages/journey/JourneyDetails";
+import JourneyLayout from "../components/JourneyLayout";
+
 import CustomerBooking from "../pages/customer/CustomerBooking";
 
 import ProtectedRoute from "../context/ProtectedRoute";
@@ -29,6 +34,13 @@ function AppRoutes() {
           <Route path="/dashboard" element={<Dashboard />} />
 
           <Route path="/book" element={<CreateBooking />} />
+
+          <Route element={<JourneyLayout />}>
+            <Route path="/journeys" element={<JourneyList />} />
+            <Route path="/journeys/new" element={<JourneyForm />} />
+            <Route path="/journeys/:id" element={<JourneyDetails />} />
+            <Route path="/journeys/:id/edit" element={<JourneyForm />} />
+          </Route>
 
           {/* Bus Management */}
           <Route element={<BusLayout />}>
