@@ -42,4 +42,22 @@ CONSTRAINT MT2 CHECK( Cost > 0 )
 DESCRIBE Journey;
 
 DROP TABLE Journey;
+<<<<<<< HEAD
+
+INSERT INTO Owner (Username, Password, Name, ContactNo) VALUES
+('madmin', 'scrypt:32768:8:1$hash_placeholder', 'Main Admin', '0771234567'),
+('manager_poorna', 'scrypt:32768:8:1$hash_placeholder', 'Poorna Jayasooriya', '0719876543');
+
+INSERT INTO ExpenceLog (Expensedate, BRegistrationNo, Category, PaymentMethod, Amount, ExpenseDescription) VALUES
+('2026-03-03', 'ND-4521', 'Spare Parts', 'Cash', 12500.00, 'Replaced brake pads'),
+('2026-03-04', 'WP-ND-8890', 'Insurance', 'Bank Transfer', 185000.00, 'Annual comprehensive insurance'),
+('2026-03-08', 'NC-5612', 'Tires', 'Cheque', 96000.00, 'Purchased 2 rear tires'),
+('2026-03-12', 'SP-6701', 'Other Staff Wages', 'Cash', 5000.00, 'Cleaner allowance for Yala trip');
+
+INSERT INTO MaintenanceLog (MaintenanceDate, BRegistrationNo, MType, MDescription, Cost, Odometer, NextServiceDue) VALUES
+('2026-02-15', 'ND-4521', 'Service', 'Full engine oil change and filter replacement', 35000.00, 119500.00, '124,500 KM'),
+('2026-02-20', 'WP-ND-8890', 'Repair', 'Air conditioning compressor repair', 48000.00, 84200.00, 'Immediate checkup on next tour'),
+('2026-03-01', 'NC-5612', 'Service', 'Gearbox oil replacement and general check', 28000.00, 144800.00, '150,000 KM');
+=======
 DROP TABLE ExpenceLog;
+>>>>>>> c6c0c034c5d5d0bdb27dfce18b2081965a477627
