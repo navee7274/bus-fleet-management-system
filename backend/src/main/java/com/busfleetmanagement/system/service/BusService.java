@@ -37,7 +37,6 @@ public class  BusService {
         Bus existingRecord = BusRepository.findById(bRegistrationNo)
                 .orElseThrow(() -> new RuntimeException("Bus record not found"));
 
-        existingRecord.setBusRegistrationNo(bus.getBusRegistrationNo());
         existingRecord.setPurchaseDate(bus.getPurchaseDate());
         existingRecord.setPurchasePrice(bus.getPurchasePrice());
         existingRecord.setCapacity(bus.getCapacity());

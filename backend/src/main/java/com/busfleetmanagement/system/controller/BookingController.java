@@ -3,11 +3,13 @@ package com.busfleetmanagement.system.controller;
 import com.busfleetmanagement.system.dto.BookingRequest;
 import com.busfleetmanagement.system.dto.BookingResponse;
 import com.busfleetmanagement.system.entity.Booking;
+import com.busfleetmanagement.system.entity.Bus;
 import com.busfleetmanagement.system.enums.BookingStatus;
 import com.busfleetmanagement.system.exception.ResourceNotFoundException;
 import com.busfleetmanagement.system.service.AvailabilityService;
 import com.busfleetmanagement.system.service.BookingService;
 
+import com.busfleetmanagement.system.service.BusService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,13 +26,15 @@ public class BookingController {
 
     private final BookingService bookingService;
     private final AvailabilityService availabilityService;
+    private final BusService busService;
 
     public BookingController(
             BookingService bookingService,
-            AvailabilityService availabilityService
+            AvailabilityService availabilityService, BusService busService
     ) {
         this.bookingService = bookingService;
         this.availabilityService = availabilityService;
+        this.busService = busService;
     }
 
 
@@ -113,7 +117,9 @@ public class BookingController {
 
         Booking booking = new Booking();
 
+        // =========================
         // Customer Details
+        // =========================
         booking.setCustomerFirstName(request.getCustomerFirstName());
         booking.setCustomerLastName(request.getCustomerLastName());
         booking.setCustomerContactPhone(request.getCustomerContactPhone());
@@ -121,25 +127,45 @@ public class BookingController {
         booking.setCustomerAddress(request.getCustomerAddress());
         booking.setCustomerCity(request.getCustomerCity());
 
+        // =========================
         // Booking Details
+        // =========================
         booking.setStartDateTime(request.getStartDateTime());
         booking.setEndDateTime(request.getEndDateTime());
         booking.setStartLocation(request.getStartLocation());
         booking.setDestination(request.getDestination());
         booking.setPassengerCount(request.getPassengerCount());
 
-        // Initial booking state
+        // =========================
+        // Bus
+        // =========================
+        Bus bus = busService.getBusById(
+                request.getBusRegistrationNo()
+        ).orElseThrow(()-> new ResourceNotFoundException("Bus not found"));
+
+        booking.setBus(bus);
+
+        // Driver is NOT assigned when booking is created
+        booking.setDriver(null);
+
+        // =========================
+        // Initial Booking State
+        // =========================
         booking.setStatus(BookingStatus.PENDING);
 
-        // Initial pricing
+        // =========================
+        // Initial Pricing
+        // =========================
         booking.setEstimatedCost(BigDecimal.ZERO);
         booking.setFinalPrice(null);
 
-        // Created timestamp
+        // =========================
+        // Created Timestamp
+        // =========================
         booking.setCreatedAt(LocalDateTime.now());
 
-        // Advance amount is already initialized to 8000
-        // in the Booking entity
+        // AdvanceAmount is already initialized
+        // to 8000 in the Booking entity
 
         Booking savedBooking = bookingService.createBooking(booking);
 

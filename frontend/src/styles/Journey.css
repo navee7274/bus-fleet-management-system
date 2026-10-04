@@ -1,0 +1,175 @@
+.journey-layout-main {
+  flex: 1;
+  min-width: 0;
+  margin-left: 240px;
+}
+
+.journey-page,
+.journey-form-page,
+.journey-details-page {
+  padding: 30px;
+}
+
+.journey-header,
+.journey-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.journey-header h1,
+.journey-details-header h1 {
+  margin: 0;
+}
+
+.journey-header p,
+.journey-details-header p {
+  color: #777;
+  margin-top: 5px;
+}
+
+/* Table */
+
+.journey-table-container {
+  overflow-x: auto;
+}
+
+.journey-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.journey-table th,
+.journey-table td {
+  padding: 14px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.journey-table th {
+  background: #f5f5f5;
+}
+
+.journey-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.journey-actions button {
+  padding: 7px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.delete-btn {
+  color: white;
+  background: #dc3545;
+}
+
+/* Status */
+
+.journey-status {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+  background: #eee;
+}
+
+/* Form */
+
+.journey-form-container {
+  max-width: 800px;
+  margin: auto;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 7px;
+  font-weight: 600;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+/* Details */
+
+.journey-details-card {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 25px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.detail-item span {
+  color: #777;
+  font-size: 14px;
+}
+
+.error-message {
+  background: #ffe5e5;
+  color: #b00020;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px;
+}
+
+/* Mobile */
+
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .journey-details-card {
+    grid-template-columns: 1fr;
+  }
+
+  .journey-header,
+  .journey-details-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+}

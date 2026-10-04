@@ -33,8 +33,7 @@ public class ExpenceController {
     public ResponseEntity<ExpenceLog> getExpenseById(
             @PathVariable int expenceID) {
 
-        return ResponseEntity.ok(
-                expenceLogService.getExpenceById(expenceID)
+        return ResponseEntity.ok(expenceLogService.getExpenceById(expenceID)
         );
     }
 
@@ -43,8 +42,7 @@ public class ExpenceController {
     public ResponseEntity<ExpenceLog> createExpense(
             @RequestBody ExpenceLog expenceLog) {
 
-        ExpenceLog createdExpense =
-                expenceLogService.createExpence(expenceLog);
+        ExpenceLog createdExpense = expenceLogService.createExpence(expenceLog);
 
         return new ResponseEntity<>(
                 createdExpense,
@@ -58,8 +56,7 @@ public class ExpenceController {
             @PathVariable int expenceID,
             @RequestBody ExpenceLog expenceLog) {
 
-        ExpenceLog updatedExpence =
-                expenceLogService.updateExpence(
+        ExpenceLog updatedExpence = expenceLogService.updateExpence(
                         expenceID,
                         expenceLog
                 );
