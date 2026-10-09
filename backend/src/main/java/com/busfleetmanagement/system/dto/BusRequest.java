@@ -5,7 +5,7 @@ import java.time.LocalDate;
 
 public class BusRequest {
 
-    private String bRegistrationNo;
+    private String busRegistrationNo;
     private LocalDate purchaseDate;
     private BigDecimal purchasePrice;
     private Integer capacity;
@@ -13,11 +13,11 @@ public class BusRequest {
     private boolean active;
 
     public String getBusRegistrationNo() {
-        return bRegistrationNo;
+        return busRegistrationNo;
     }
 
     public void setBusRegistrationNo(String bRegistrationNo) {
-        this.bRegistrationNo = bRegistrationNo;
+        this.busRegistrationNo = bRegistrationNo;
     }
 
     public LocalDate getPurchaseDate() {

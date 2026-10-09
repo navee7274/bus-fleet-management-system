@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 
 public class DriverRequest {
 
-    private String DriverID;
     private String Name;
     private String NIC;
     private String ContactNo;
@@ -14,14 +13,6 @@ public class DriverRequest {
     private boolean DActive;
 
     public DriverRequest() {
-    }
-
-    public String getDriverID() {
-        return DriverID;
-    }
-
-    public void setDriverID(String DriverID) {
-        this.DriverID = DriverID;
     }
 
     public String getName() {

@@ -44,7 +44,6 @@ public class DriverController {
 
         Driver driver = new Driver();
 
-        driver.setDriverID(request.getDriverID());
         driver.setName(request.getName());
         driver.setNIC(request.getNIC());
         driver.setContactNo(request.getContactNo());
