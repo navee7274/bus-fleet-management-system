@@ -11,7 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/expenses")
 @CrossOrigin
-public class ExpenceController {
+public class  ExpenceController {
 
     private final ExpenceLogService expenceLogService;
 

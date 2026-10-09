@@ -40,6 +40,7 @@ public class JourneyService {
                 .orElseThrow(() ->
                         new RuntimeException("Journey not found with ID: " + journeyID));
     }
+
     //Create a new journey
     public Journey createJourney(Journey journey){
 

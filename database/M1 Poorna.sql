@@ -35,6 +35,9 @@ FLitersfilled DECIMAL(10,2) GENERATED ALWAYS AS(FCost/FPrice) STORED,
 FOREIGN KEY (BRegistrationNo) REFERENCES Bus(BRegistrationNo)
 );
 
+/* The Final Table
+FuelLogID | BRegistrationNo | FDate | FFuelPrice | FCost | FLitersFilled */
+
 DROP TABLE FuelLog;
 DROP TABLE Journey;
 
@@ -86,8 +89,7 @@ VALUES
 ('NC-5612', '2025-10-30', 370.00, 31450.00),
 ('SP-6701', '2025-10-31', 370.00, 40700.00);
 
-/* The Final Table
-FuelLogID | BRegistrationNo | FDate | FFuelPrice | FCost | FLitersFilled */
+
 
 SELECT StartOdometer, EndOdometer, KMTRavelled FROM Journey;
 SELECT FCost, FPrice, FLitersfilled FROM FuelLog;
