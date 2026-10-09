@@ -36,9 +36,11 @@ public class JourneyService {
 
     //Get journey by ID
     public Journey getJourneyById(int journeyID){
-        return journeyRepository.findById(journeyID).orElseThrow(() ->
+        return journeyRepository.findById(journeyID)
+                .orElseThrow(() ->
                         new RuntimeException("Journey not found with ID: " + journeyID));
     }
+
     //Create a new journey
     public Journey createJourney(Journey journey){
 
@@ -48,7 +50,9 @@ public class JourneyService {
             throw new RuntimeException("Bus is required");
         }
 
-        Bus bus = busRepository.findById(journey.getBus().getBusRegistrationNo()).orElseThrow(() ->
+        Bus bus = busRepository
+                .findById(journey.getBus().getBusRegistrationNo())
+                .orElseThrow(() ->
                         new RuntimeException("Bus not found"));
 
         //Check driver
@@ -57,7 +61,9 @@ public class JourneyService {
             throw new RuntimeException("Driver is required");
         }
 
-        Driver driver = driverRepository.findById(journey.getDriver().getDriverID()).orElseThrow(() ->
+        Driver driver = driverRepository
+                .findById(journey.getDriver().getDriverID())
+                .orElseThrow(() ->
                         new RuntimeException("Driver not found"));
 
         //Validate odometer readings
@@ -104,11 +110,6 @@ public class JourneyService {
         if(existingJourney.getEndOdometer().compareTo(existingJourney.getStartOdometer()) < 0){
             throw new RuntimeException("End odometer cannot be less than start odometer");
         }
-
-        //Recalculate KM travelled
-        BigDecimal kmTravelled = existingJourney.getEndOdometer().subtract(existingJourney.getStartOdometer());
-
-        existingJourney.setKmTraveled(kmTravelled);
 
         //Update bus if supplied
         if(journey.getBus() != null && journey.getBus().getBusRegistrationNo() != null) {
