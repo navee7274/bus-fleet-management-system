@@ -18,9 +18,63 @@ public class DriverService {
         this.DriverRepository = DriverRepository;
     }
 
+    private String generateDriverId() {
+
+        System.out.println("Generating Driver ID...");
+
+        List<Driver> drivers = DriverRepository.findAll();
+
+        if (drivers.isEmpty()) {
+            return "DRV001";
+        }
+
+        int highestNumber = 0;
+
+        for (Driver driver : drivers) {
+
+            String driverID = driver.getDriverID();
+
+            if (driverID != null && driverID.matches("DRV\\d+")) {
+
+                int number = Integer.parseInt(driverID.substring(3));
+
+                if (number > highestNumber) {
+                    highestNumber = number;
+                }
+            }
+        }
+
+        return String.format("DRV%03d", highestNumber + 1);
+    }
+
     //CREAT DRIVER RECORD
     public Driver creatDriver(Driver driver) {
-        return DriverRepository.save(driver);
+
+        System.out.println("========== CREATE DRIVER ==========");
+
+        System.out.println("Received driver:");
+        System.out.println("Name: " + driver.getName());
+        System.out.println("NIC: " + driver.getNIC());
+        System.out.println("Contact: " + driver.getContactNo());
+        System.out.println("Salary: " + driver.getBaseMonthlySalary());
+        System.out.println("Allowance: " + driver.getPerTripAllowence());
+        System.out.println("Active: " + driver.isDActive());
+
+        System.out.println("Generating Driver ID...");
+
+        String driverID = generateDriverId();
+
+        System.out.println("Generated Driver ID: " + driverID);
+
+        driver.setDriverID(driverID);
+
+        System.out.println("Saving driver...");
+
+        Driver savedDriver = DriverRepository.save(driver);
+
+        System.out.println("Driver saved successfully!");
+
+        return savedDriver;
     }
 
     // READ ALL Driver RECORDS
@@ -39,7 +93,6 @@ public class DriverService {
         Driver existingRecord = DriverRepository.findById(DriverID)
                 .orElseThrow(() -> new RuntimeException("Driver record not found"));
 
-        existingRecord.setDriverID(driver.getDriverID());
         existingRecord.setName(driver.getName());
         existingRecord.setNIC(driver.getNIC());
         existingRecord.setContactNo(driver.getContactNo());
