@@ -1,9 +1,17 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import bookingService from "../../services/bookingService";
 import Button from "../../components/Button";
 import "../../styles/CustomerBooking.css";
 
+import "../../styles/LandingPage.css";
+
+import Navbar from "../../components/CustomerNavBar";
+import Footer from "../../components/CustomerFooter";
+
 function CustomerBooking() {
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
     customerFirstName: "",
     customerLastName: "",
@@ -29,6 +37,31 @@ function CustomerBooking() {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [bookingNumber, setBookingNumber] = useState("");
+
+  const [step, setStep] = useState(1);
+
+  // -----------------------------------------
+  // FORM NAVIGATION
+  // -----------------------------------------
+
+  const nextStep = () => {
+    setError("");
+    setStep((prev) => Math.min(prev + 1, 5));
+  };
+
+  const prevStep = () => {
+    setError("");
+    setStep((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleCancel = () => {
+    navigate("/");
+  };
+
+  const handleDone = () => {
+    navigate("/");
+  };
 
   // -----------------------------------------
   // HANDLE INPUT
@@ -155,6 +188,7 @@ function CustomerBooking() {
   const handleBooking = async () => {
     setError("");
     setSuccess("");
+    setBookingNumber("");
 
     if (!form.busRegistrationNo) {
       setError("Please select a bus.");
@@ -185,9 +219,14 @@ function CustomerBooking() {
 
       console.log("Sending booking:", bookingData);
 
-      await bookingService.createBooking(bookingData);
+      const response = await bookingService.createBooking(bookingData);
+      const bookingResponse = response?.data?.booking ?? response?.data?.data ?? response?.data;
+      const returnedBookingNumber = bookingResponse?.bookingID;
 
       setSuccess("Booking request submitted successfully!");
+      if (returnedBookingNumber != null) {
+        setBookingNumber(String(returnedBookingNumber));
+      }
 
       setAvailableBuses([]);
 
@@ -210,13 +249,22 @@ function CustomerBooking() {
 
   return (
     <div className="customer-booking-page">
+      <Navbar />
       <div className="booking-container">
         {/* HEADER */}
 
         <div className="booking-header">
-          <h1>Book a Bus</h1>
+          <div className="booking-header-text">
+            <h1>Book a Bus</h1>
+            <p>Enter your details and journey information.</p>
+          </div>
+          {/* BOOKING PROGRESS */}
 
-          <p>Enter your details and journey information.</p>
+          <p>Step {step} of 4</p>
+        </div>
+
+        <div className="booking-progress">
+          <div className="booking-progress-fill" style={{ width: `${(step / 4) * 100}%` }} />
         </div>
 
         {/* ERROR */}
@@ -229,107 +277,115 @@ function CustomerBooking() {
 
         {/* CUSTOMER DETAILS */}
 
-        <div className="booking-card">
-          <h2>Customer Details</h2>
+        {step === 1 && (
+          <div className="booking-card">
+            <h2>Customer Details</h2>
+            <div className="form-row">
+              <div className="form-group">
+                <label>First Name</label>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label>First Name</label>
+                <input type="text" name="customerFirstName" value={form.customerFirstName} onChange={handleChange} required />
+              </div>
 
-              <input type="text" name="customerFirstName" value={form.customerFirstName} onChange={handleChange} required />
+              <div className="form-group">
+                <label>Last Name</label>
+
+                <input type="text" name="customerLastName" value={form.customerLastName} onChange={handleChange} required />
+              </div>
             </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Phone Number</label>
 
-            <div className="form-group">
-              <label>Last Name</label>
+                <input
+                  type="tel"
+                  name="customerContactPhone"
+                  value={form.customerContactPhone}
+                  onChange={handleChange}
+                  maxLength="10"
+                  placeholder="0712345678"
+                  required
+                />
+              </div>
 
-              <input type="text" name="customerLastName" value={form.customerLastName} onChange={handleChange} required />
+              <div className="form-group">
+                <label>Email</label>
+
+                <input type="email" name="customerContactEmail" value={form.customerContactEmail} onChange={handleChange} required />
+              </div>
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Address</label>
+
+                <input type="text" name="customerAddress" value={form.customerAddress} onChange={handleChange} required />
+              </div>
+
+              <div className="form-group">
+                <label>City</label>
+
+                <input type="text" name="customerCity" value={form.customerCity} onChange={handleChange} required />
+              </div>
+            </div>
+            <div className="button-row">
+              <Button onClick={handleCancel}>Cancel</Button>
+              <Button onClick={nextStep}>Next</Button>
             </div>
           </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label>Phone Number</label>
-
-              <input
-                type="tel"
-                name="customerContactPhone"
-                value={form.customerContactPhone}
-                onChange={handleChange}
-                maxLength="10"
-                placeholder="0712345678"
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Email</label>
-
-              <input type="email" name="customerContactEmail" value={form.customerContactEmail} onChange={handleChange} required />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label>Address</label>
-
-              <input type="text" name="customerAddress" value={form.customerAddress} onChange={handleChange} required />
-            </div>
-
-            <div className="form-group">
-              <label>City</label>
-
-              <input type="text" name="customerCity" value={form.customerCity} onChange={handleChange} required />
-            </div>
-          </div>
-        </div>
+        )}
 
         {/* JOURNEY DETAILS */}
 
-        <div className="booking-card">
-          <h2>Journey Details</h2>
+        {step === 2 && (
+          <div className="booking-card">
+            <h2>Journey Details</h2>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label>Start Location</label>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Start Location</label>
 
-              <input type="text" name="startLocation" value={form.startLocation} onChange={handleChange} placeholder="e.g. Colombo" required />
+                <input type="text" name="startLocation" value={form.startLocation} onChange={handleChange} placeholder="e.g. Colombo" required />
+              </div>
+
+              <div className="form-group">
+                <label>Destination</label>
+
+                <input type="text" name="destination" value={form.destination} onChange={handleChange} placeholder="e.g. Kandy" required />
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Start Date & Time</label>
+
+                <input type="datetime-local" name="startDateTime" value={form.startDateTime} onChange={handleChange} required />
+              </div>
+
+              <div className="form-group">
+                <label>End Date & Time</label>
+
+                <input type="datetime-local" name="endDateTime" value={form.endDateTime} onChange={handleChange} required />
+              </div>
             </div>
 
             <div className="form-group">
-              <label>Destination</label>
+              <label>Passenger Count</label>
 
-              <input type="text" name="destination" value={form.destination} onChange={handleChange} placeholder="e.g. Kandy" required />
+              <input type="number" name="passengerCount" value={form.passengerCount} onChange={handleChange} min="1" required />
+            </div>
+
+            <div className="button-row">
+              <Button onClick={prevStep}>Back</Button>
+              <Button onClick={checkAvailability} disabled={checking}>
+                {checking ? "Checking..." : "Check Availability"}
+              </Button>
             </div>
           </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label>Start Date & Time</label>
-
-              <input type="datetime-local" name="startDateTime" value={form.startDateTime} onChange={handleChange} required />
-            </div>
-
-            <div className="form-group">
-              <label>End Date & Time</label>
-
-              <input type="datetime-local" name="endDateTime" value={form.endDateTime} onChange={handleChange} required />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label>Passenger Count</label>
-
-            <input type="number" name="passengerCount" value={form.passengerCount} onChange={handleChange} min="1" required />
-          </div>
-
-          <Button onClick={checkAvailability} disabled={checking}>
-            {checking ? "Checking..." : "Check Available Buses"}
-          </Button>
-        </div>
+        )}
 
         {/* AVAILABLE BUSES */}
 
-        {availableBuses.length > 0 && (
+        {step === 2 && availableBuses.length > 0 && (
           <div className="booking-card">
             <h2>Select a Bus</h2>
 
@@ -355,38 +411,62 @@ function CustomerBooking() {
                   </div>
                 );
               })}
+              <div className="button-row">
+                <Button onClick={nextStep}>Next</Button>
+              </div>
             </div>
           </div>
         )}
 
         {/* SELECTED BUS */}
 
-        {form.busRegistrationNo && (
+        {step === 3 && form.busRegistrationNo && (
           <div className="booking-card">
             <h2>Selected Bus</h2>
 
             <p>Registration Number:</p>
 
             <strong>{form.busRegistrationNo}</strong>
+            <div className="button-row">
+              <Button onClick={prevStep}>Back</Button>
+              <Button onClick={nextStep}>Next</Button>
+            </div>
           </div>
         )}
 
         {/* PRICE */}
 
-        {form.busRegistrationNo && (
+        {step === 4 && form.busRegistrationNo && (
           <div className="booking-card price-card">
             <h2>Estimated Cost</h2>
 
             <div className="price">Rs. {calculateEstimatedCost().toLocaleString()}</div>
 
             <p>This is an estimated cost. The final price will be confirmed by the owner.</p>
+            <div className="button-row">
+              <Button onClick={prevStep}>Back</Button>
+              <Button onClick={handleBooking} disabled={submitting}>
+                {submitting ? "Submitting..." : "Request Booking"}
+              </Button>
+            </div>
+          </div>
+        )}
 
-            <Button onClick={handleBooking} disabled={submitting}>
-              {submitting ? "Submitting..." : "Request Booking"}
-            </Button>
+        {step === 4 && success && (
+          <div className="booking-card price-card">
+            <h2>Booking Sent</h2>
+
+            <p>Booking number: Please remember the booking number for future uses.</p>
+            <div className="price">{bookingNumber && <p>#{bookingNumber}</p>}</div>
+
+            <p>It may take up to 12 hours for the owner to review the request. Contact the owner for faster process</p>
+            <div className="button-row">
+              <Button onClick={handleDone}>Done</Button>
+            </div>
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }

@@ -32,7 +32,7 @@ public class Payment {
     @Column(name = "PaymentStatus", nullable = false)
     private PaymentStatus paymentStatus;
 
-    @Column(name = "TransactionReference", nullable = false, length = 100)
+    @Column(name = "TransactionReference", length = 100)
     private String TransactionReference;
 
     public Payment(){

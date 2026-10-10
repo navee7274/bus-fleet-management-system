@@ -1,13 +1,13 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
-import "../styles/Journey.css";
+import "../styles/Booking.css";
 
-function JourneyLayout() {
+function BookingLayout() {
   return (
     <div className="dashboard">
       <Sidebar />
-      <div className="journey-layout-main">
+      <div className="booking-layout-main">
         <Navbar />
         <Outlet />
       </div>
@@ -15,4 +15,4 @@ function JourneyLayout() {
   );
 }
 
-export default JourneyLayout;
+export default BookingLayout;

@@ -56,13 +56,13 @@ public class Booking {
     @JoinColumn(name = "DriverID", referencedColumnName = "DriverID")
     private Driver driver;
 
-    @Column(name = "EstimatedCost", nullable = false)
+    @Column(name = "EstimatedCost")
     private BigDecimal EstimatedCost;
 
-    @Column(name = "FinalPrice", nullable = true)
+    @Column(name = "FinalPrice")
     private BigDecimal FinalPrice;
 
-    @Column(name = "AdvanceAmount", nullable = false)
+    @Column(name = "AdvanceAmount")
     private BigDecimal AdvanceAmount = BigDecimal.valueOf(8000.00);
 
     @Enumerated(EnumType.STRING)

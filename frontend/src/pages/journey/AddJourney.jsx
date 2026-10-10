@@ -1,15 +1,13 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import journeyService from "../../services/journeyService";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "../../components/Button";
-import Loading from "../../components/Loading";
+import journeyService from "../../services/journeyService";
 import "../../styles/Journey.css";
 
-function JourneyForm() {
+function AddJourney() {
   const navigate = useNavigate();
-  const { id } = useParams();
 
-  const isEdit = Boolean(id);
+  const isEdit = false;
 
   const [formData, setFormData] = useState({
     journeyID: "",
@@ -25,153 +23,54 @@ function JourneyForm() {
     notes: "",
   });
 
-  const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  /*
-   * Load journey when editing
-   */
-  useEffect(() => {
-    if (!isEdit) {
-      return;
-    }
+  const handleChange = (event) => {
+    const { name, value, type, checked } = event.target;
 
-    const loadJourney = async () => {
-      try {
-        setLoading(true);
-        setError("");
-
-        const data = await journeyService.getById(id);
-
-        setFormData({
-          journeyID: data.journeyID || "",
-          journeyDate: data.journeyDate || "",
-          busRegistrationNo: data.bus?.busRegistrationNo || "",
-          driverID: data.driver?.DriverID || "",
-          purpose: data.purpose || "",
-          clientDestination: data.clientDestination || "",
-          startOdometer: data.startOdometer ?? "",
-          endOdometer: data.endOdometer ?? "",
-          kmTraveled: data.kmTraveled ?? "",
-          incomeAmount: data.incomeAmount ?? "",
-          notes: data.notes || "",
-        });
-      } catch (err) {
-        console.error(err);
-        setError("Failed to load journey.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadJourney();
-  }, [id, isEdit]);
-
-  /*
-   * Handle input changes
-   */
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setFormData((prev) => {
-      const updated = {
-        ...prev,
-        [name]: value,
-      };
-
-      /*
-       * Automatically calculate KM travelled
-       */
-      if (name === "startOdometer" || name === "endOdometer") {
-        const start = Number(name === "startOdometer" ? value : prev.startOdometer);
-
-        const end = Number(name === "endOdometer" ? value : prev.endOdometer);
-
-        if (!isNaN(start) && !isNaN(end) && end >= start) {
-          updated.kmTraveled = (end - start).toFixed(2);
-        } else {
-          updated.kmTraveled = "";
-        }
-      }
-
-      return updated;
-    });
+    setFormData((current) => ({
+      ...current,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
-  /*
-   * Submit form
-   */
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    setError("");
-
-    /*
-     * Basic validation
-     */
-    if (Number(formData.endOdometer) < Number(formData.startOdometer)) {
-      setError("End odometer cannot be less than start odometer.");
-      return;
-    }
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
     try {
       setSaving(true);
+      setError("");
 
-      /*
-       * This is the request body sent to Spring Boot.
-       */
-      const journeyData = {
-        journeyID: Number(formData.journeyID),
-
-        journeyDate: formData.journeyDate,
-
-        busRegistrationNo: formData.busRegistrationNo,
-
-        driverID: formData.driverID,
-
-        purpose: formData.purpose,
-
-        clientDestination: formData.clientDestination,
-
-        startOdometer: Number(formData.startOdometer),
-
-        endOdometer: Number(formData.endOdometer),
-
-        kmTraveled: Number(formData.kmTraveled),
-
-        incomeAmount: Number(formData.incomeAmount),
-
-        notes: formData.notes,
-      };
-
-      if (isEdit) {
-        await journeyService.update(id, journeyData);
-      } else {
-        await journeyService.create(journeyData);
-      }
+      await journeyService.create({
+        journeyID: data.journeyID || "",
+        journeyDate: data.journeyDate || "",
+        busRegistrationNo: data.bus?.busRegistrationNo || "",
+        driverID: data.driver?.DriverID || "",
+        purpose: data.purpose || "",
+        clientDestination: data.clientDestination || "",
+        startOdometer: data.startOdometer ?? "",
+        endOdometer: data.endOdometer ?? "",
+        kmTraveled: data.kmTraveled ?? "",
+        incomeAmount: data.incomeAmount ?? "",
+        notes: data.notes || "",
+      });
 
       navigate("/journeys");
-    } catch (err) {
-      console.error(err);
-
-      setError(err.response?.data?.message || "Failed to save journey.");
+    } catch (error) {
+      console.error(error);
+      setError(error.response?.data?.message || "Failed to add journey.");
     } finally {
       setSaving(false);
     }
   };
 
-  if (loading) {
-    return <Loading />;
-  }
-
   return (
     <div className="journey-page">
-      {/* Header */}
       <div className="page-header">
         <div>
-          <h1>Edit Journey</h1>
-          <p>Update journey information</p>
+          <h1>Add a Journey</h1>
+          <p>Enter your journey details below.</p>
         </div>
       </div>
 
@@ -293,4 +192,4 @@ function JourneyForm() {
   );
 }
 
-export default JourneyForm;
+export default AddJourney;

@@ -68,7 +68,6 @@ public class BookingRequest {
     @Min(value = 1, message = "Passenger count must be at least 1")
     private int passengerCount;
 
-
     // =========================
     // Bus
     // =========================
