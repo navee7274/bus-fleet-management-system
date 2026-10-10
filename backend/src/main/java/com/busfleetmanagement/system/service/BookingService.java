@@ -6,6 +6,7 @@ import com.busfleetmanagement.system.entity.Driver;
 import com.busfleetmanagement.system.entity.Payment;
 import com.busfleetmanagement.system.enums.BookingStatus;
 import com.busfleetmanagement.system.enums.PaymentStatus;
+import com.busfleetmanagement.system.exception.BadRequestException;
 import com.busfleetmanagement.system.exception.ResourceNotFoundException;
 import com.busfleetmanagement.system.repository.BookingRepository;
 import com.busfleetmanagement.system.repository.BusRepository;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,10 +26,15 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private BusRepository busRepository;
     private DriverRepository driverRepository;
-    private PaymentRepository paymentRepository;
 
-    public BookingService(BookingRepository bookingRepository){
+    private PaymentService paymentService;
+
+
+    public BookingService(BookingRepository bookingRepository, BusRepository busRepository, DriverRepository driverRepository, PaymentService paymentService){
         this.bookingRepository = bookingRepository;
+        this.busRepository = busRepository;
+        this.driverRepository = driverRepository;
+        this.paymentService = paymentService;
     }
 
     // VALIDATE PHONE NUMBER
@@ -62,6 +69,10 @@ public class BookingService {
         validateEmail(email);
         validatePhoneNumber(phone);
     }
+
+    //////////////////////////////////////////////////////////////
+    /////////////////////// CRUD FUNCTIONS ///////////////////////
+    //////////////////////////////////////////////////////////////
 
     // CREATE BOOKING
     public Booking createBooking(Booking booking){
@@ -113,6 +124,10 @@ public class BookingService {
         return bookingRepository.findByStatus(BookingStatus.PENDING);
     }
 
+    //////////////////////////////////////////////////////////////
+    //////////////////// BUSINESS FUNCTIONS //////////////////////
+    //////////////////////////////////////////////////////////////
+
     // ASSIGN BUS
     public Booking assignBus(int BookingID, String bRegistrationNo){
         Booking existingBooking = bookingRepository.findById(BookingID)
@@ -131,40 +146,107 @@ public class BookingService {
         Booking existingBooking = bookingRepository.findById(BookingID)
                 .orElseThrow(()-> new ResourceNotFoundException("Booking not found"));
 
+        System.out.println("Looking for: " + DriverID);
+
         Driver driver = driverRepository.findById(DriverID)
-                .orElseThrow(() -> new RuntimeException("Bus not found"));
+                .orElseThrow(()-> new ResourceNotFoundException("Driver not found"));
+
+        System.out.println("Found: " + DriverID);
 
         existingBooking.setDriver(driver);
 
         return bookingRepository.save(existingBooking);
     }
 
-    // SET BOOKING PRICE
-    public Booking setBookingPrice(int BookingID, BigDecimal bookingPrice){
-        Booking existingBooking = bookingRepository.findById(BookingID)
-                .orElseThrow(()-> new ResourceNotFoundException("Booking not found"));
+    // SET PRICE
+    public Booking setPrice(int BookingId, BigDecimal bookingPrice){
+        Booking existingBooking = bookingRepository.findById(BookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
+
+        if(existingBooking.getStatus() != BookingStatus.PENDING &&
+                existingBooking.getStatus() != BookingStatus.PAYMENT_PENDING){
+            throw new BadRequestException(
+                    "Price cannot be changed in this state of a booking."
+            );
+        }
 
         existingBooking.setFinalPrice(bookingPrice);
 
         return bookingRepository.save(existingBooking);
     }
 
-    // APPROVE BOOKING
-    public Booking approveBooking(int BookingID){
-        Booking existingBooking = bookingRepository.findById(BookingID)
-                .orElseThrow(()-> new ResourceNotFoundException("Booking not found"));
+    // SET ADVANCE AMOUNT
+    public Booking setAdvanceAmount(int BookingId, BigDecimal advanceAmount){
+        Booking existingBooking = bookingRepository.findById(BookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
 
-        existingBooking.setStatus(BookingStatus.PAYMENT_PENDING);
+        if(existingBooking.getStatus() != BookingStatus.PENDING &&
+                existingBooking.getStatus() != BookingStatus.PAYMENT_PENDING){
+            throw new BadRequestException(
+                    "Advance amount cannot be changed in this state of a booking."
+            );
+        }
+
+        existingBooking.setAdvanceAmount(advanceAmount);
 
         return bookingRepository.save(existingBooking);
     }
 
-    // REJECT BOOKING
-    public Booking rejectBooking(int BookingID){
+    // APPROVE BOOKING
+    public Booking approveBooking(int BookingID, String paymentMethod){
         Booking existingBooking = bookingRepository.findById(BookingID)
                 .orElseThrow(()-> new ResourceNotFoundException("Booking not found"));
 
-        existingBooking.setStatus(BookingStatus.REJECTED);
+        if(existingBooking.getStatus() != BookingStatus.PENDING){
+            throw new BadRequestException(
+                    "Booking cannot be approved in this state."
+            );
+        }
+
+        if(existingBooking.getDriver() == null || existingBooking.getBus() == null){
+            throw new BadRequestException(
+                    "Booking cannot be approved when driver or Bus is not assigned."
+            );
+        }
+
+        if(!existingBooking.getDriver().isDActive() || !existingBooking.getBus().isActive()){
+            throw new BadRequestException(
+                    "Booking cannot be approved when driver or Bus is not active."
+            );
+        }
+
+        if(existingBooking.getAdvanceAmount() == null ||
+                existingBooking.getAdvanceAmount().compareTo(BigDecimal.ZERO) <= 0 ||
+                existingBooking.getFinalPrice() == null ||
+                existingBooking.getFinalPrice().compareTo(BigDecimal.ZERO) <= 0
+        ){
+            throw new BadRequestException(
+                    "Booking cannot be approved when Advance amount/ final price is not set"
+            );
+        }
+
+
+        String[] paymentMethods = {"Bank_Transfer", "Card_Payment", "Cash"};
+
+        if(!Arrays.asList(paymentMethods).contains(paymentMethod) ){
+            throw new BadRequestException(
+                    "Invalid payment method."
+            );
+        }
+
+        String paymentMethod_f = paymentMethod.replace("_", " ");
+
+        Payment payment = new Payment();
+
+        payment.setBooking(existingBooking);
+        payment.setAmount(existingBooking.getAdvanceAmount());
+        payment.setPaymentDate(LocalDateTime.now());
+        payment.setPaymentMethod(paymentMethod_f);
+        payment.setPaymentStatus(PaymentStatus.PENDING);
+
+        paymentService.createPaymentRecord(payment);
+
+        existingBooking.setStatus(BookingStatus.PAYMENT_PENDING);
 
         return bookingRepository.save(existingBooking);
     }
@@ -179,16 +261,6 @@ public class BookingService {
         return bookingRepository.save(toConfirmBooking);
     }
 
-    // CANCEL BOOKING
-    public Booking cancelBooking(int BookingID){
-        Booking toCancelBooking = bookingRepository.findById(BookingID)
-                .orElseThrow(()-> new ResourceNotFoundException("Booking not found"));
-
-        toCancelBooking.setStatus(BookingStatus.CANCELLED);
-
-        return bookingRepository.save(toCancelBooking);
-    }
-
     // COMPLETE BOOKING
     public Booking completeBooking(int BookingID){
         Booking toCompleteBooking = bookingRepository.findById(BookingID)
@@ -199,28 +271,24 @@ public class BookingService {
         return bookingRepository.save(toCompleteBooking);
     }
 
-    @Transactional
-    public Booking makePayment(int BookingID) {
+    // REJECT BOOKING
+    public Booking rejectBooking(int BookingID){
+        Booking existingBooking = bookingRepository.findById(BookingID)
+                .orElseThrow(()-> new ResourceNotFoundException("Booking not found"));
 
-        Booking booking = bookingRepository.findById(BookingID)
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
+        existingBooking.setStatus(BookingStatus.REJECTED);
 
-        if (booking.getStatus() != BookingStatus.PAYMENT_PENDING) {
-            throw new RuntimeException(
-                    "Payment cannot be made for this booking"
-            );
-        }
-
-        Payment payment = new Payment();
-        payment.setBooking(booking);
-        payment.setAmount(booking.getAdvanceAmount());
-        payment.setPaymentDate(LocalDateTime.now());
-        payment.setPaymentStatus(PaymentStatus.SUCCESS);
-
-        paymentRepository.save(payment);
-
-        booking.setStatus(BookingStatus.CONFIRMED);
-
-        return bookingRepository.save(booking);
+        return bookingRepository.save(existingBooking);
     }
+
+    // CANCEL BOOKING
+    public Booking cancelBooking(int BookingID){
+        Booking toCancelBooking = bookingRepository.findById(BookingID)
+                .orElseThrow(()-> new ResourceNotFoundException("Booking not found"));
+
+        toCancelBooking.setStatus(BookingStatus.CANCELLED);
+
+        return bookingRepository.save(toCancelBooking);
+    }
+
 }

@@ -1,44 +1,47 @@
 .journey-layout-main {
-  flex: 1;
-  min-width: 0;
   margin-left: 240px;
+  min-height: 100vh;
 }
 
-.journey-page,
-.journey-form-page,
-.journey-details-page {
+.journey-page {
   padding: 30px;
 }
 
-.journey-header,
-.journey-details-header {
+/* Header */
+
+.page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 25px;
 }
 
-.journey-header h1,
-.journey-details-header h1 {
-  margin: 0;
+.page-header h1 {
+  margin: 0 0 5px;
+  font-size: 28px;
+  color: #111827;
 }
 
-.journey-header p,
-.journey-details-header p {
-  color: #777;
-  margin-top: 5px;
+.page-header p {
+  margin: 0;
+  color: #6b7280;
 }
 
 /* Table */
 
 .journey-table-container {
+  background: #ffffff;
+
+  border-radius: 10px;
+
+  border: 1px solid #e5e7eb;
+
   overflow-x: auto;
 }
 
 .journey-table {
   width: 100%;
   border-collapse: collapse;
-  background: white;
 }
 
 .journey-table th,
@@ -80,18 +83,24 @@
 
 /* Form */
 
-.journey-form-container {
+.journey-form {
   max-width: 800px;
-  margin: auto;
+
+  background: #ffffff;
+
+  padding: 30px;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 10px;
 }
 
 .form-row {
-  display: flex;
-  gap: 20px;
-}
+  display: grid;
 
-.form-row .form-group {
-  flex: 1;
+  grid-template-columns: 1fr 1fr;
+
+  gap: 20px;
 }
 
 .form-group {
@@ -100,23 +109,46 @@
 
 .form-group label {
   display: block;
+
   margin-bottom: 7px;
+
   font-weight: 600;
+
+  color: #374151;
 }
 
 .form-group input,
-.form-group select {
+.form-group textarea {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-sizing: border-box;
+
+  padding: 11px 13px;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 7px;
+
+  font-size: 14px;
+
+  outline: none;
+
+  font-family: inherit;
 }
 
-.form-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
+.form-group textarea {
+  resize: vertical;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #2563eb;
+
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.form-group input:disabled {
+  background: #f3f4f6;
+
+  color: #6b7280;
 }
 
 /* Details */

@@ -37,6 +37,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/bookings/**").permitAll()
                         .requestMatchers("/api/availability/**").permitAll()
+
+                        // REMOVE IN PRODUCTION [START] !!!!!!!!!!!!!!
+
+                        .requestMatchers("/api/**").permitAll()
+
+                        // REMOVE IN PRODUCTION [END] !!!!!!!!!!!!!!!!!!!
+
                         .anyRequest().authenticated()
                 )
 

@@ -44,10 +44,96 @@ INSERT INTO Bus (BRegistrationNo, BPurchaseDate, BPurchasePrice, BCapacity, BNot
 
 TRUNCATE TABLE Driver;
 TRUNCATE TABLE Bus;
+SELECT * FROM BUS;
 /* The Final Bus Table 
 BRegistrationNo | BPurchaseDate | BPurchasePrice | BCapacity | BNotes | BActive */
 
 /* The Final Driver Table 
 DriverID | Name | NIC | ContactNo | BaseMonthlySalary | PerTripAllowence | notes | DActive*/
+
+/* Monthly Driver salary */
+SELECT
+    d.DriverID,
+    d.Name,
+    d.BaseMonthlySalary,
+    COUNT(j.JourneyID) AS TotalTrips,
+    d.PerTripAllowence,
+    COUNT(j.JourneyID) * d.PerTripAllowence AS TotalTripAllowance,
+    d.BaseMonthlySalary +
+        (COUNT(j.JourneyID) * d.PerTripAllowence) AS TotalSalary
+FROM Driver d
+LEFT JOIN Journey j
+    ON d.DriverID = j.DriverID
+    AND j.JourneyDate >= '2025-10-01'
+    AND j.JourneyDate < '2025-11-01'
+WHERE d.DActive = TRUE
+GROUP BY
+    d.DriverID,
+    d.Name,
+    d.BaseMonthlySalary,
+    d.PerTripAllowence
+ORDER BY d.Name;
+
+/* individual Driver Salary */
+SELECT
+    d.DriverID,
+    d.Name,
+    d.BaseMonthlySalary,
+    COUNT(j.JourneyID) AS TotalTrips,
+    d.PerTripAllowence,
+    COUNT(j.JourneyID) * d.PerTripAllowence AS TotalTripAllowance,
+    d.BaseMonthlySalary +
+        (COUNT(j.JourneyID) * d.PerTripAllowence) AS TotalSalary
+FROM Driver d
+LEFT JOIN Journey j
+    ON d.DriverID = j.DriverID
+    AND j.JourneyDate >= '2025-10-01'
+    AND j.JourneyDate < '2025-11-01'
+WHERE d.DriverID = 'DRV001'
+  AND d.DActive = TRUE
+GROUP BY
+    d.DriverID,
+    d.Name,
+    d.BaseMonthlySalary,
+    d.PerTripAllowence;
+    
+/* Totsl Driver Salary*/
+SELECT
+    COALESCE(SUM(
+        d.BaseMonthlySalary +
+        (
+            SELECT COUNT(*)
+            FROM Journey j
+            WHERE j.DriverID = d.DriverID
+              AND j.JourneyDate >= '2025-10-01'
+              AND j.JourneyDate < '2025-11-01'
+        ) * d.PerTripAllowence
+    ), 0) AS TotalDriverSalary
+FROM Driver d
+WHERE d.DActive = TRUE;
+
+/* Driver Performance*/
+SELECT
+    d.DriverID,
+    d.Name,
+    COUNT(j.JourneyID) AS TotalJourneys,
+    COALESCE(SUM(j.KMTravelled), 0) AS TotalKM,
+    COALESCE(SUM(j.IncomeAmount), 0) AS TotalIncome,
+    d.BaseMonthlySalary,
+    d.PerTripAllowence,
+    d.BaseMonthlySalary +
+        (COUNT(j.JourneyID) * d.PerTripAllowence) AS TotalSalary
+FROM Driver d
+LEFT JOIN Journey j
+    ON d.DriverID = j.DriverID
+    AND j.JourneyDate >= '2025-10-01'
+    AND j.JourneyDate < '2025-11-01'
+WHERE d.DActive = TRUE
+GROUP BY
+    d.DriverID,
+    d.Name,
+    d.BaseMonthlySalary,
+    d.PerTripAllowence
+ORDER BY TotalJourneys DESC;
 
 

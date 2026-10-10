@@ -102,7 +102,7 @@ function JourneyList() {
               {journeys.map((journey) => (
                 <tr key={journey.journeyID}>
                   <td>
-                    <strong>{journey.journeyID}</strong>
+                    <strong>{journey.journeyID.toString().padStart(8, "0")}</strong>
                   </td>
 
                   <td>{journey.journeyDate}</td>

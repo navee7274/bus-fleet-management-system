@@ -62,7 +62,7 @@ function AddBus() {
         </div>
       </div>
 
-      <form className="bus-form" onSubmit={handleSubmit}>
+      <form className="driver-form" onSubmit={handleSubmit}>
         {error && <div className="error-message">{error}</div>}
 
         <div className="form-row">

@@ -58,19 +58,15 @@ function JourneyDetails() {
   }
 
   return (
-    <div className="journey-details-page">
+    <div className="journey-page">
       {/* Header */}
-      <div className="journey-details-header">
+      <div className="page-header">
         <div>
           <h1>Journey #{journey.journeyID}</h1>
           <p>View journey information</p>
         </div>
 
-        <div className="journey-header-actions">
-          <Button onClick={() => navigate(`/journeys/${journey.journeyID}/edit`)}>Edit</Button>
-
-          <Button onClick={() => navigate("/journeys")}>Back</Button>
-        </div>
+        <Button onClick={() => navigate(`/journeys/${journey.journeyID}/edit`)}>Edit</Button>
       </div>
 
       {/* Journey Information */}
