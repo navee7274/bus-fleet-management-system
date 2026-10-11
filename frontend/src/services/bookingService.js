@@ -18,13 +18,21 @@ const bookingService = {
     return response.data;
   },
 
-  approveBooking: async (id) => {
-    const response = await api.get(`/bookings/${id}/approve`);
+  approveBooking: async (id, paymentMethod, driverID, advanceAmount, finalPrice) => {
+    const response = await api.post(`/bookings/${id}/approve`, null, {
+      params: {
+        paymentMethod,
+        driverID,
+        advanceAmount,
+        finalPrice,
+      },
+    });
+
     return response.data;
   },
 
   confirmBooking: async (id) => {
-    const response = await api.get(`/bookings/${id}/confirm`);
+    const response = await api.post(`/bookings/${id}/confirm`);
     return response.data;
   },
 
@@ -33,8 +41,14 @@ const bookingService = {
     return response.data;
   },
 
-  completeBooking: async (id) => {
-    const response = await api.get(`/bookings/${id}/complete`);
+  completeBooking: async (id, startOdo, endOdo) => {
+    const response = await api.post(`/bookings/${id}/complete`, null, {
+      params: {
+        startOdo,
+        endOdo,
+      },
+    });
+
     return response.data;
   },
 
@@ -49,8 +63,27 @@ const bookingService = {
     return api.post("/availability/buses", availabilityRequest);
   },
 
+  getAvailableDrivers: (availabilityRequest) => {
+    return api.post("/availability/drivers", availabilityRequest);
+  },
+
   createBooking: (bookingData) => {
     return api.post("/bookings", bookingData);
+  },
+
+  getPaymentData: async (bookingId) => {
+    const response = await api.get(`/payments/${bookingId}`);
+    return response.data;
+  },
+
+  getPaymentMethod: async (bookingId) => {
+    const response = await api.get(`/payments/${bookingId}/paymentmethod`);
+    return response.data;
+  },
+
+  markPaymentDone: async (bookingId) => {
+    const response = await api.post(`/payments/${bookingId}/mark`);
+    return response.data;
   },
 };
 

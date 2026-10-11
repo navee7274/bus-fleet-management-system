@@ -47,7 +47,47 @@ function CustomerBooking() {
 
   const nextStep = () => {
     setError("");
-    setStep((prev) => Math.min(prev + 1, 5));
+
+    if (step === 1) {
+      const requiredFields = [
+        ["customerFirstName", "First name"],
+        ["customerLastName", "Last name"],
+        ["customerContactPhone", "Phone number"],
+        ["customerContactEmail", "Email"],
+        ["customerAddress", "Address"],
+        ["customerCity", "City"],
+      ];
+
+      for (const [field, label] of requiredFields) {
+        if (!form[field].trim()) {
+          setError(`${label} is required.`);
+          return;
+        }
+      }
+
+      // Sri Lankan mobile number validation
+      if (!/^0\d{9}$/.test(form.customerContactPhone)) {
+        setError("Enter a valid 10-digit phone number.");
+        return;
+      }
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.customerContactEmail)) {
+        setError("Enter a valid email address.");
+        return;
+      }
+    }
+
+    if (step === 2 && !form.busRegistrationNo) {
+      setError("Please check availability and select a bus.");
+      return;
+    }
+
+    if (step === 3 && !form.busRegistrationNo) {
+      setError("Please select a bus before continuing.");
+      return;
+    }
+
+    setStep((prev) => Math.min(prev + 1, 4));
   };
 
   const prevStep = () => {
@@ -88,18 +128,44 @@ function CustomerBooking() {
     setAvailableBuses([]);
 
     // Validation
-    if (!form.startDateTime || !form.endDateTime) {
-      setError("Please select the start and end date/time.");
+
+    if (!form.startLocation.trim() || !form.destination.trim()) {
+      setError("Start location and destination are required.");
       return;
     }
 
-    if (new Date(form.startDateTime) >= new Date(form.endDateTime)) {
+    if (form.startLocation.trim().toLowerCase() === form.destination.trim().toLowerCase()) {
+      setError("Start location and destination cannot be the same.");
+      return;
+    }
+
+    if (!form.startDateTime || !form.endDateTime) {
+      setError("Please select both start and end date/time.");
+      return;
+    }
+
+    const start = new Date(form.startDateTime);
+    const end = new Date(form.endDateTime);
+
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+      setError("Please enter valid dates and times.");
+      return;
+    }
+
+    if (start <= new Date()) {
+      setError("The journey start time must be in the future.");
+      return;
+    }
+
+    if (end <= start) {
       setError("End date/time must be after start date/time.");
       return;
     }
 
-    if (Number(form.passengerCount) <= 0) {
-      setError("Passenger count must be greater than 0.");
+    const passengers = Number(form.passengerCount);
+
+    if (!Number.isInteger(passengers) || passengers < 1) {
+      setError("Passenger count must be a positive whole number.");
       return;
     }
 
@@ -190,8 +256,44 @@ function CustomerBooking() {
     setSuccess("");
     setBookingNumber("");
 
-    if (!form.busRegistrationNo) {
-      setError("Please select a bus.");
+    const requiredFields = [
+      ["customerFirstName", "First name"],
+      ["customerLastName", "Last name"],
+      ["customerContactPhone", "Phone number"],
+      ["customerContactEmail", "Email"],
+      ["customerAddress", "Address"],
+      ["customerCity", "City"],
+      ["startLocation", "Start location"],
+      ["destination", "Destination"],
+      ["startDateTime", "Start date/time"],
+      ["endDateTime", "End date/time"],
+      ["busRegistrationNo", "Bus selection"],
+    ];
+
+    for (const [field, label] of requiredFields) {
+      if (!String(form[field] ?? "").trim()) {
+        setError(`${label} is required.`);
+        return;
+      }
+    }
+
+    if (!/^0\d{9}$/.test(form.customerContactPhone)) {
+      setError("Enter a valid 10-digit phone number.");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.customerContactEmail)) {
+      setError("Enter a valid email address.");
+      return;
+    }
+
+    if (new Date(form.startDateTime) <= new Date() || new Date(form.endDateTime) <= new Date(form.startDateTime)) {
+      setError("Please check your journey date and time.");
+      return;
+    }
+
+    if (!Number.isInteger(Number(form.passengerCount)) || Number(form.passengerCount) < 1) {
+      setError("Enter a valid passenger count.");
       return;
     }
 
@@ -284,7 +386,7 @@ function CustomerBooking() {
               <div className="form-group">
                 <label>First Name</label>
 
-                <input type="text" name="customerFirstName" value={form.customerFirstName} onChange={handleChange} required />
+                <input type="text" name="customerFirstName" value={form.customerFirstName} onChange={handleChange} required maxLength={50} />
               </div>
 
               <div className="form-group">
@@ -302,8 +404,9 @@ function CustomerBooking() {
                   name="customerContactPhone"
                   value={form.customerContactPhone}
                   onChange={handleChange}
-                  maxLength="10"
                   placeholder="0712345678"
+                  pattern="0[0-9]{9}"
+                  maxLength={10}
                   required
                 />
               </div>
@@ -328,7 +431,9 @@ function CustomerBooking() {
               </div>
             </div>
             <div className="button-row">
-              <Button onClick={handleCancel}>Cancel</Button>
+              <Button onClick={handleCancel} className="secondary-button">
+                Cancel
+              </Button>
               <Button onClick={nextStep}>Next</Button>
             </div>
           </div>
@@ -371,11 +476,13 @@ function CustomerBooking() {
             <div className="form-group">
               <label>Passenger Count</label>
 
-              <input type="number" name="passengerCount" value={form.passengerCount} onChange={handleChange} min="1" required />
+              <input type="number" name="passengerCount" value={form.passengerCount} onChange={handleChange} min="1" step="1" required />
             </div>
 
             <div className="button-row">
-              <Button onClick={prevStep}>Back</Button>
+              <Button onClick={prevStep} className="secondary-button">
+                Back
+              </Button>
               <Button onClick={checkAvailability} disabled={checking}>
                 {checking ? "Checking..." : "Check Availability"}
               </Button>
@@ -423,12 +530,14 @@ function CustomerBooking() {
         {step === 3 && form.busRegistrationNo && (
           <div className="booking-card">
             <h2>Selected Bus</h2>
-
-            <p>Registration Number:</p>
-
-            <strong>{form.busRegistrationNo}</strong>
+            <div className="booking-bus-info">
+              <p>Registration Number:</p>
+              <strong>{form.busRegistrationNo}</strong>
+            </div>
             <div className="button-row">
-              <Button onClick={prevStep}>Back</Button>
+              <Button onClick={prevStep} className="secondary-button">
+                Back
+              </Button>
               <Button onClick={nextStep}>Next</Button>
             </div>
           </div>
@@ -444,7 +553,9 @@ function CustomerBooking() {
 
             <p>This is an estimated cost. The final price will be confirmed by the owner.</p>
             <div className="button-row">
-              <Button onClick={prevStep}>Back</Button>
+              <Button onClick={prevStep} className="secondary-button">
+                Back
+              </Button>
               <Button onClick={handleBooking} disabled={submitting}>
                 {submitting ? "Submitting..." : "Request Booking"}
               </Button>

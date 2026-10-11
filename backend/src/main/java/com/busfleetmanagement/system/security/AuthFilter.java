@@ -30,21 +30,31 @@ public class AuthFilter extends OncePerRequestFilter {
 
         String requestURI = request.getRequestURI();
 
-        // REMOVE IN PRODUCTION [START] !!!!!!!!!!!!!!
-        if (true) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        // REMOVE IN PRODUCTION [END] !!!!!!!!!!!!!!
-
-
         // Allow login without authentication
-        if (requestURI.equals("/api/auth/login") || requestURI.equals("/api/availability/buses")) {
+        if (requestURI.equals("/api/auth/login")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        if (requestURI.equals("/api/bookings") && "POST".equals(request.getMethod())) {
+        boolean publicPost =
+                "POST".equalsIgnoreCase(request.getMethod())
+                        && (
+                        requestURI.equals("/api/bookings")
+                                || requestURI.equals("/api/availability/buses")
+                                || requestURI.equals("/api/availability/drivers")
+                                || requestURI.matches("/api/payments/\\d+/mark")
+                                || requestURI.equals("/api/payments/notify")
+                );
+
+        boolean publicGet =
+                "GET".equalsIgnoreCase(request.getMethod())
+                        && (
+                        requestURI.matches("/api/bookings/\\d+")
+                                || requestURI.matches("/api/payments/\\d+")
+                                || requestURI.matches("/api/payments/\\d+/paymentmethod")
+                );
+
+        if (publicPost || publicGet) {
             filterChain.doFilter(request, response);
             return;
         }

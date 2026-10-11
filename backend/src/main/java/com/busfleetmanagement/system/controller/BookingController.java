@@ -244,22 +244,20 @@ public class BookingController {
     }
 
 
-    /**
-     * Customer makes the advance payment for a booking.
-     */
-    @PostMapping("/{bookingId}/payment")
-    public ResponseEntity<?> makePayment(
-            @PathVariable Integer bookingId) {
-
-        return ResponseEntity.ok(
-                bookingService.makePayment(bookingId)
-        );
-    }
-
-
     // =========================================================
     // OWNER
     // =========================================================
+
+    /**
+     * Get all bookings (owner).
+     */
+    @GetMapping
+    public ResponseEntity<List<BookingResponse>> getAllBookings() {
+        return ResponseEntity.ok(
+                toResponse(bookingService.getAllBookings())
+        );
+    }
+
 
     /**
      * Get all pending booking requests.
@@ -300,15 +298,50 @@ public class BookingController {
 
         return ResponseEntity.ok(
                 toResponse(
-                        bookingService.setBookingPrice(bookingId, price)
+                        bookingService.setPrice(bookingId, price)
                 )
         );
     }
 
+    @PutMapping("/{bookingId}/advance-amount")
+    public ResponseEntity<BookingResponse> setAdvanceAmount(
+            @PathVariable Integer bookingId,
+            @RequestParam BigDecimal advanceAmount) {
 
-    /**
-     * Owner assigns a bus to the booking.
-     */
+        return ResponseEntity.ok(
+                toResponse(
+                        bookingService.setAdvanceAmount(bookingId, advanceAmount)
+                )
+        );
+    }
+
+    public BigDecimal parseAmount(String value) {
+        try {
+            return new BigDecimal(value);
+        } catch (NumberFormatException | NullPointerException e) {
+            throw new IllegalArgumentException(
+                    "Invalid amount: " + value
+            );
+        }
+    }
+
+    //POST http://localhost:8080/api/bookings/2/approve?paymentMethod=Card_Payment&driverID=DRV001&advanceAmount=8000.00&finalPrice=25000.00
+
+    @PostMapping("/{bookingId}/approve")
+    public ResponseEntity<BookingResponse> approveBooking(
+            @PathVariable Integer bookingId,
+            @RequestParam String paymentMethod,
+            @RequestParam String driverID,
+            @RequestParam String advanceAmount,
+            @RequestParam String finalPrice) {
+
+        return ResponseEntity.ok(
+                toResponse(
+                        bookingService.approveBooking(bookingId, paymentMethod, driverID, parseAmount(advanceAmount), parseAmount(finalPrice))
+                )
+        );
+    }
+
     @PutMapping("/{bookingId}/bus")
     public ResponseEntity<BookingResponse> setBookingBus(
             @PathVariable Integer bookingId,
@@ -324,10 +357,6 @@ public class BookingController {
         );
     }
 
-
-    /**
-     * Owner assigns a driver to the booking.
-     */
     @PutMapping("/{bookingId}/driver")
     public ResponseEntity<BookingResponse> setBookingDriver(
             @PathVariable Integer bookingId,
@@ -343,11 +372,6 @@ public class BookingController {
         );
     }
 
-
-    /**
-     * Owner confirms the booking after customer payment.
-     * BookingService can create the actual Journey here.
-     */
     @PostMapping("/{bookingId}/confirm")
     public ResponseEntity<BookingResponse> confirmBooking(
             @PathVariable Integer bookingId) {
@@ -359,10 +383,19 @@ public class BookingController {
         );
     }
 
+    @PostMapping("/{bookingId}/complete")
+    public ResponseEntity<BookingResponse> completeBooking(
+            @PathVariable Integer bookingId,
+            @RequestParam BigDecimal startOdo,
+            @RequestParam BigDecimal endOdo) {
 
-    /**
-     * Owner rejects a booking request.
-     */
+        return ResponseEntity.ok(
+                toResponse(
+                        bookingService.completeBooking(bookingId, startOdo, endOdo)
+                )
+        );
+    }
+
     @PostMapping("/{bookingId}/reject")
     public ResponseEntity<BookingResponse> rejectBooking(
             @PathVariable Integer bookingId) {
@@ -374,10 +407,6 @@ public class BookingController {
         );
     }
 
-
-    /**
-     * Cancel a booking.
-     */
     @PostMapping("/{bookingId}/cancel")
     public ResponseEntity<BookingResponse> cancelBooking(
             @PathVariable Integer bookingId) {

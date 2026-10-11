@@ -13,6 +13,7 @@ import java.time.LocalDate;
 public class Journey {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "JourneyID", nullable = false, unique = true, length = 20)
     private int journeyID;
 

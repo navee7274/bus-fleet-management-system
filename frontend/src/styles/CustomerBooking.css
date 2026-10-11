@@ -1,6 +1,8 @@
 .customer-booking-page {
   min-height: 100vh;
   background: #f5f7fa;
+  display: grid;
+  grid-template-rows: auto auto auto;
 }
 
 .booking-container {
@@ -121,6 +123,15 @@
   height: 20px;
 }
 
+.booking-bus-info {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.booking-bus-info strong {
+  margin-left: 5px;
+}
+
 .price-card {
   text-align: center;
 }
@@ -175,4 +186,328 @@
   .customer-booking-page {
     padding: 20px 10px;
   }
+}
+
+/* ================================
+   TRACK BOOKING PAGE
+================================ */
+
+.track-booking-container {
+  max-width: 1100px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 48px 20px 64px;
+}
+
+.track-booking-header {
+  margin-bottom: 28px;
+}
+
+.track-booking-eyebrow {
+  color: #2563eb;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1px;
+  margin: 0 0 8px;
+}
+
+.track-booking-header h1 {
+  color: #172554;
+  font-size: 32px;
+  margin: 0;
+}
+
+.track-booking-header > p:last-child {
+  color: #64748b;
+  margin: 10px 0 0;
+  line-height: 1.6;
+}
+
+.track-booking-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 24px;
+  align-items: start;
+}
+
+.track-search-card,
+.track-details-card {
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  min-width: 0;
+}
+
+.track-search-card h2,
+.track-details-card h2 {
+  margin: 0 0 8px;
+  color: #172554;
+  font-size: 20px;
+}
+
+.track-booking-description {
+  color: #64748b;
+  margin: 0 0 22px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.track-search-card .form-group {
+  margin-bottom: 14px;
+}
+
+.track-search-card .form-group label {
+  color: #334155;
+  margin-bottom: 8px;
+}
+
+.track-search-card .form-group input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 16px;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.track-search-card .form-group input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.track-primary-button,
+.track-secondary-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 11px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+
+.track-primary-button {
+  width: 100%;
+  border: 1px solid #2563eb;
+  background: #2563eb;
+  color: white;
+}
+
+.track-primary-button:hover:not(:disabled) {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.track-primary-button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+#track-secondary-button {
+  border: 1px solid #cbd5e1;
+  background: white;
+  color: #334155;
+}
+
+#track-secondary-button:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.track-details-card {
+  min-height: 270px;
+}
+
+.track-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.track-details-header .track-booking-description {
+  margin-bottom: 0;
+}
+
+.track-booking-status {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  max-width: 45%;
+  overflow-wrap: anywhere;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.track-booking-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr));
+  gap: 20px 14px;
+}
+
+.track-booking-field {
+  min-width: 0;
+}
+
+.track-booking-field span {
+  display: block;
+  color: #64748b;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.track-booking-field strong {
+  display: block;
+  color: #1e293b;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.track-booking-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  border-top: 1px solid #e2e8f0;
+  margin-top: 22px;
+  padding-top: 18px;
+}
+
+.track-booking-actions .track-primary-button {
+  width: auto;
+}
+
+.track-booking-empty {
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #94a3b8;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.track-booking-empty p {
+  line-height: 1.6;
+  margin: 8px 0 0;
+}
+
+.track-booking-empty strong {
+  color: #64748b;
+}
+
+.track-booking-empty-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 32px;
+}
+
+.track-booking-subtext {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid rgb(223, 223, 223);
+}
+
+.status {
+  display: inline-block;
+
+  padding: 5px 10px;
+
+  border-radius: 20px;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-pending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.status-payment-pending {
+  background-color: #ffedd5;
+  color: #9a3412;
+}
+
+.status-confirmed {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.status-completed {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.status-rejected {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.status-cancelled {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+@media (max-width: 700px) {
+  .track-booking-container {
+    padding: 32px 10px 40px;
+  }
+
+  .track-booking-header h1 {
+    font-size: 27px;
+  }
+
+  .track-search-card,
+  .track-details-card {
+    padding: 20px;
+  }
+
+  .track-details-header {
+    flex-wrap: wrap;
+  }
+
+  .track-booking-actions > button {
+    flex: 1;
+  }
+}
+
+.bank-transfer-details {
+  margin-block: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgb(230, 230, 230);
+}
+
+.bank-transfer-details h3 {
+  margin-bottom: 10px;
+}
+
+.bank-transfer-details p {
+  color: rgb(73, 73, 73);
+  margin-bottom: 4px;
+  font-size: 0.95rem;
 }

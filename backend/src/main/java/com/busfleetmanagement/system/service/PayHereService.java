@@ -3,8 +3,11 @@ package com.busfleetmanagement.system.service;
 import com.busfleetmanagement.system.config.PayHereConfig;
 import com.busfleetmanagement.system.dto.PayHerePaymentResponse;
 import com.busfleetmanagement.system.entity.Booking;
+import com.busfleetmanagement.system.entity.Payment;
 import com.busfleetmanagement.system.enums.BookingStatus;
+import com.busfleetmanagement.system.enums.PaymentStatus;
 import com.busfleetmanagement.system.repository.BookingRepository;
+import com.busfleetmanagement.system.repository.PaymentRepository;
 import com.busfleetmanagement.system.util.PayHereHashUtil;
 
 import org.springframework.stereotype.Service;
@@ -12,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -19,13 +23,16 @@ public class PayHereService {
 
     private final PayHereConfig payHereConfig;
     private final BookingRepository bookingRepository;
+    private final PaymentRepository paymentRepository;
 
     public PayHereService(
             PayHereConfig payHereConfig,
-            BookingRepository bookingRepository
-    ) {
+            BookingRepository bookingRepository,
+            PaymentRepository paymentRepository) {
+
         this.payHereConfig = payHereConfig;
         this.bookingRepository = bookingRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     /**
@@ -39,15 +46,45 @@ public class PayHereService {
                         new RuntimeException("Booking not found")
                 );
 
+        Payment paymentRecord = paymentRepository
+                .findPaymentByBookingId(bookingId)
+                .orElseThrow(() ->
+                        new RuntimeException("Payment record not found"));
+
+
         if (booking.getStatus() != BookingStatus.PAYMENT_PENDING) {
             throw new RuntimeException("Booking is not waiting for payment");
+        }
+
+        // Disallow invalid payment retry attempts
+        if (paymentRecord.getPaymentStatus() != PaymentStatus.PENDING
+                && paymentRecord.getPaymentStatus() != PaymentStatus.FAILED) {
+            throw new RuntimeException("Payment cannot be retried");
+        }
+
+        // Disallow non-card payments
+        if (!"Card Payment".equals(paymentRecord.getPaymentMethod())) {
+            throw new RuntimeException(
+                    "Card payment cannot be made for non-card payment bookings"
+            );
+        }
+
+        // Reset a failed payment for a new attempt.
+        if (paymentRecord.getPaymentStatus() == PaymentStatus.FAILED) {
+            paymentRecord.setPaymentStatus(PaymentStatus.PENDING);
+            paymentRecord.setTransactionReference(null);
+            paymentRepository.save(paymentRecord);
         }
 
         /*
          * Change this to whatever field you use
          * for the advance/payment amount.
          */
-        BigDecimal paymentAmount = booking.getAdvanceAmount();
+        BigDecimal paymentAmount = paymentRecord.getAmount();
+
+        if (paymentAmount == null || paymentAmount.signum() <= 0) {
+            throw new IllegalStateException("Invalid payment amount");
+        }
 
         String amount = paymentAmount
                 .setScale(2, RoundingMode.HALF_UP)
@@ -221,6 +258,21 @@ public class PayHereService {
                         )
                 );
 
+        Payment paymentRecord = paymentRepository
+                .findPaymentByBookingId(bookingId)
+                .orElseThrow(() ->
+                        new RuntimeException("Payment record not found"));
+
+        BigDecimal notifiedAmount = new BigDecimal(payHereAmount);
+
+        if (notifiedAmount.compareTo(paymentRecord.getAmount()) != 0) {
+            throw new RuntimeException("Payment amount mismatch");
+        }
+
+        if (!"LKR".equals(payHereCurrency)) {
+            throw new RuntimeException("Payment currency mismatch");
+        }
+
         /*
          * PayHere:
          *
@@ -230,6 +282,12 @@ public class PayHereService {
          * -2 = failed
          * -3 = chargedback
          */
+
+        if (paymentRecord.getPaymentStatus() == PaymentStatus.SUCCESS) {
+            // A duplicate successful notification is safe to ignore.
+            return;
+        }
+
         switch (statusCode) {
 
             case "2":
@@ -237,43 +295,38 @@ public class PayHereService {
                 /*
                  * Payment successful.
                  */
-                booking.setStatus(
-                        BookingStatus.CONFIRMED
-                );
+
+                paymentRecord.setPaymentStatus(PaymentStatus.SUCCESS);
+                paymentRecord.setTransactionReference(paymentId);
+                booking.setStatus(BookingStatus.CONFIRMED);
 
                 break;
 
             case "0":
-
-                /*
-                 * Payment pending.
-                 */
-                booking.setStatus(
-                        BookingStatus.PAYMENT_PENDING
-                );
-
+                // Keep the booking waiting for payment.
                 break;
 
             case "-1":
             case "-2":
-            case "-3":
-
-                /*
-                 * Payment failed/cancelled.
-                 */
-                booking.setStatus(
-                        BookingStatus.REJECTED
-                );
-
+                paymentRecord.setPaymentStatus(PaymentStatus.FAILED);
+                paymentRecord.setTransactionReference(paymentId);
+                // Keep the booking PAYMENT_PENDING so the customer can retry.
                 break;
 
-            default:
+            case "-3":
+                paymentRecord.setPaymentStatus(PaymentStatus.FAILED);
+                paymentRecord.setTransactionReference(paymentId);
+                // Apply your chargeback policy to the booking.
+                break;
 
+
+            default:
                 throw new RuntimeException(
                         "Unknown PayHere status: " + statusCode
                 );
         }
 
         bookingRepository.save(booking);
+        paymentRepository.save(paymentRecord);
     }
 }
