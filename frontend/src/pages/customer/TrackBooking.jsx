@@ -2,24 +2,28 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import bookingService from "../../services/bookingService";
 import "../../styles/CustomerBooking.css";
-
 import "../../styles/LandingPage.css";
+
+import Button from "../../components/Button";
 
 import Navbar from "../../components/CustomerNavBar";
 import Footer from "../../components/CustomerFooter";
 
 function TrackBooking() {
   const navigate = useNavigate();
+
   const [bookingNumber, setBookingNumber] = useState("");
   const [booking, setBooking] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [paymentStatus, setPaymentStatus] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const trackBooking = async (event) => {
-    event.preventDefault();
-    const number = bookingNumber.trim();
-    if (!number) {
-      setError("Enter your booking number to continue.");
+  const trackBooking = async (e) => {
+    e.preventDefault();
+
+    if (!bookingNumber.trim()) {
+      setError("Enter your booking number.");
       return;
     }
 
@@ -28,185 +32,313 @@ function TrackBooking() {
     setBooking(null);
 
     try {
-      const lookup = bookingService.trackBooking || bookingService.getBookingByNumber || bookingService.getBookingById || bookingService.getBooking;
+      const response = await bookingService.getById(bookingNumber.trim());
 
-      if (!lookup) throw new Error("Booking tracking is currently unavailable.");
+      const bookingData = response?.booking ?? response;
+      setBooking(bookingData);
 
-      const response = await lookup.call(bookingService, number);
-      const result = response?.data ?? response;
-      const details = result?.booking ?? result;
-      if (!details || typeof details !== "object") {
-        throw new Error("No booking was found with that number.");
-      }
-      setBooking(details);
+      await getPaymentMethod(bookingData.bookingID);
+
+      nextStep();
     } catch (err) {
-      setError(err?.response?.data?.message || err?.message || "Unable to find this booking. Check the number and try again.");
+      setError(err?.response?.data?.message || "Booking not found.");
     } finally {
       setLoading(false);
     }
   };
 
-  const displayValue = (...values) => {
-    const value = values.find((item) => item !== undefined && item !== null && item !== "");
-    if (!value) return "—";
-    if (typeof value === "object") return value.name || value.label || value.city || "—";
-    return String(value);
+  const getPaymentMethod = async (bookingID) => {
+    try {
+      const paymentData = await bookingService.getPaymentMethod(bookingID);
+
+      setPaymentMethod(paymentData.paymentMethod);
+      setPaymentStatus(paymentData.paymentStatus);
+    } catch (err) {
+      setPaymentMethod(null);
+      setPaymentStatus(null);
+    }
   };
 
-  const status = displayValue(booking?.status, booking?.bookingStatus);
-  const fields = [
-    ["Passenger", displayValue(booking?.passengerName, booking?.customerName, booking?.user?.name)],
-    ["Route", displayValue(booking?.routeName, booking?.route, booking?.trip?.route)],
-    ["Travel date", displayValue(booking?.travelDate, booking?.journeyDate, booking?.trip?.departureDate)],
-    ["Departure", displayValue(booking?.departureTime, booking?.trip?.departureTime)],
-    ["Seat(s)", displayValue(booking?.seats, booking?.seatNumbers, booking?.seatNumber)],
-    ["Total", displayValue(booking?.totalAmount, booking?.amount, booking?.fare)],
-  ];
+  const makePayment = async (e) => {
+    e?.preventDefault();
+
+    if (!booking) return;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      // Ask the backend to generate the payment payload
+      const payload = await bookingService.getPaymentData(booking.bookingID);
+
+      if (!window.payhere) {
+        throw new Error("PayHere SDK failed to load.");
+      }
+
+      // Payment completed doesn't necessarily mean success.
+      window.payhere.onCompleted = (orderId) => {
+        setError(`Payment submitted for ${orderId}. ` + "Please check your booking status shortly.");
+      };
+
+      window.payhere.onDismissed = () => {
+        setError("Payment window closed.");
+      };
+
+      window.payhere.onError = (error) => {
+        setError(`PayHere error: ${error}`);
+      };
+
+      // Map your Java DTO fields to PayHere's expected names
+      const payment = {
+        sandbox: true, // Use false for live payments
+        merchant_id: payload.merchantId,
+        return_url: payload.returnUrl,
+        cancel_url: payload.cancelUrl,
+        notify_url: payload.notifyUrl,
+        order_id: payload.orderId,
+        items: payload.items,
+        amount: payload.amount,
+        currency: payload.currency,
+        hash: payload.hash,
+        first_name: payload.firstName,
+        last_name: payload.lastName,
+        email: payload.email,
+        phone: payload.phone,
+        address: payload.address,
+        city: payload.city,
+        country: payload.country,
+      };
+
+      window.payhere.startPayment(payment);
+    } catch (err) {
+      setError(err?.response?.data?.message || err?.message || "Unable to initiate payment.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const markPayment = async (e) => {
+    e?.preventDefault();
+
+    setLoading(true);
+    setError("");
+
+    try {
+      await bookingService.markPaymentDone(booking.bookingID);
+    } catch (err) {
+      setError(err?.response?.data?.message || "Failed to mark payment.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const [step, setStep] = useState(1);
+
+  const nextStep = () => {
+    setError("");
+    setStep((prev) => Math.min(prev + 1, 2));
+  };
+
+  const prevStep = () => {
+    setError("");
+    setStep((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleCancel = () => {
+    navigate("/");
+  };
+
+  const handleDone = () => {
+    navigate("/");
+  };
+
+  const formatDate = (date) =>
+    date
+      ? new Date(date)
+          .toLocaleString("en-US", {
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          })
+          .replace(",", " •")
+      : "—";
+
+  const formatPrice = (price) => {
+    const value = price?.parsedValue ?? price?.source ?? price;
+
+    return value != null && value !== "" ? `Rs. ${Number(value).toLocaleString("en-LK")}` : "—";
+  };
+
+  const fields = booking
+    ? [
+        ["Passenger", `${booking.customerFirstName} ${booking.customerLastName}`],
+        ["Route", `${booking.startLocation} → ${booking.destination}`],
+        ["Bus", booking.busRegistrationNo],
+        ["Start", formatDate(booking.startDateTime)],
+        ["End", formatDate(booking.endDateTime)],
+        ["Passengers", booking.passengerCount],
+        ["Estimated cost", formatPrice(booking.estimatedCost)],
+        ["Final price", formatPrice(booking.finalPrice)],
+        ["Advance amount", formatPrice(booking.advanceAmount)],
+      ]
+    : [];
 
   return (
     <div className="customer-booking-page">
       <Navbar />
 
-      <main style={{ maxWidth: 1100, margin: "0 auto", padding: "48px 20px 64px", width: "100%", boxSizing: "border-box" }}>
-        <header style={{ marginBottom: 28 }}>
-          <p style={{ color: "#2563eb", fontWeight: 700, margin: "0 0 8px" }}>CUSTOMER PORTAL</p>
-          <h1 style={{ margin: 0, color: "#172554" }}>Track your booking</h1>
-          <p style={{ color: "#64748b", margin: "10px 0 0" }}>Enter your booking number to view your trip details and status.</p>
+      <main className="track-booking-container">
+        <header className="track-booking-header">
+          <h1>Track your booking</h1>
+          <p>Enter your booking ID to view your booking details.</p>
         </header>
+        {error && (
+          <div className="booking-error" role="alert">
+            {error}
+          </div>
+        )}
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24, alignItems: "start" }}>
-          <section
-            style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 16, padding: 24, boxShadow: "0 8px 24px rgba(15, 23, 42, 0.06)" }}
-          >
-            <h2 style={{ margin: "0 0 8px", color: "#172554", fontSize: 20 }}>Find a booking</h2>
-            <p style={{ color: "#64748b", margin: "0 0 22px", lineHeight: 1.5 }}>Your booking number is shown on your confirmation.</p>
-            <form onSubmit={trackBooking}>
-              <label htmlFor="booking-number" style={{ display: "block", fontWeight: 600, marginBottom: 8, color: "#334155" }}>
-                Booking number
-              </label>
-              <input
-                id="booking-number"
-                type="text"
-                value={bookingNumber}
-                onChange={(event) => setBookingNumber(event.target.value)}
-                placeholder="e.g. BK-123456"
-                autoComplete="off"
-                style={{
-                  width: "100%",
-                  boxSizing: "border-box",
-                  padding: "12px 14px",
-                  border: "1px solid #cbd5e1",
-                  borderRadius: 8,
-                  fontSize: 16,
-                  marginBottom: 14,
-                }}
-              />
-              <button
-                type="submit"
-                disabled={loading}
-                style={{
-                  width: "100%",
-                  border: 0,
-                  borderRadius: 8,
-                  padding: "12px 16px",
-                  background: loading ? "#94a3b8" : "#2563eb",
-                  color: "#fff",
-                  fontWeight: 700,
-                  cursor: loading ? "wait" : "pointer",
-                }}
-              >
-                {loading ? "Searching…" : "Track booking"}
-              </button>
-            </form>
-            {error && (
-              <p role="alert" style={{ color: "#b91c1c", margin: "14px 0 0" }}>
-                {error}
-              </p>
-            )}
-          </section>
+        <div className="track-booking-grid">
+          {step === 1 && (
+            <section className="booking-card track-search-card">
+              <h2>Find a booking</h2>
+              <p className="track-booking-description">Enter the booking ID from your confirmation.</p>
 
-          <section
-            aria-live="polite"
-            style={{
-              background: "#fff",
-              border: "1px solid #e2e8f0",
-              borderRadius: 16,
-              padding: 24,
-              boxShadow: "0 8px 24px rgba(15, 23, 42, 0.06)",
-              minHeight: 270,
-            }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "start", marginBottom: 20 }}>
-              <div>
-                <h2 style={{ margin: "0 0 6px", color: "#172554", fontSize: 20 }}>Booking details</h2>
-                <p style={{ color: "#64748b", margin: 0 }}>
-                  {booking
-                    ? `Booking ${displayValue(booking.bookingNumber, booking.bookingNo, booking.id)}`
-                    : "Your booking information will appear here."}
-                </p>
-              </div>
-              {booking && (
-                <span style={{ background: "#eff6ff", color: "#1d4ed8", borderRadius: 999, padding: "6px 10px", fontSize: 13, fontWeight: 700 }}>
-                  {status}
-                </span>
-              )}
-            </div>
+              <form onSubmit={trackBooking}>
+                <div className="form-group">
+                  <label htmlFor="booking-number">Booking ID</label>
+                  <input
+                    id="booking-number"
+                    type="number"
+                    min="1"
+                    value={bookingNumber}
+                    onChange={(e) => setBookingNumber(e.target.value)}
+                    placeholder="Enter booking ID"
+                    required
+                  />
+                </div>
+                <div className="button-row">
+                  <Button onClick={handleCancel} className="secondary-button">
+                    Cancel
+                  </Button>
+                  <Button onClick={trackBooking} disabled={loading}>
+                    {loading ? "Searching..." : "Track"}
+                  </Button>
+                </div>
+              </form>
+            </section>
+          )}
 
-            {booking ? (
-              <>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: "18px 14px" }}>
-                  {fields.map(([label, value]) => (
-                    <div key={label}>
-                      <div style={{ color: "#64748b", fontSize: 13, marginBottom: 5 }}>{label}</div>
-                      <div style={{ color: "#1e293b", fontWeight: 600, overflowWrap: "anywhere" }}>{value}</div>
+          {step === 2 && (
+            <section className="booking-card track-details-card">
+              <h2>Booking details</h2>
+
+              {booking ? (
+                <>
+                  <div className="track-booking-subtext">
+                    <p>
+                      Number: #<strong>{booking.bookingID}</strong>
+                    </p>
+
+                    <div className={`status status-${booking.status.toLowerCase().replaceAll("_", "-")}`}>
+                      {booking.status
+                        .toLowerCase()
+                        .replaceAll("_", " ")
+                        .replace(/\b\w/g, (c) => c.toUpperCase()) || "—"}
                     </div>
-                  ))}
-                </div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 10, borderTop: "1px solid #e2e8f0", marginTop: 22, paddingTop: 18 }}>
-                  <button
-                    type="button"
-                    onClick={() => navigate("/customer/bookings")}
-                    style={{
-                      border: 0,
-                      borderRadius: 8,
-                      padding: "10px 14px",
-                      background: "#2563eb",
-                      color: "#fff",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                    }}
-                  >
-                    My bookings
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setBooking(null);
-                      setBookingNumber("");
-                      setError("");
-                    }}
-                    style={{
-                      border: "1px solid #cbd5e1",
-                      borderRadius: 8,
-                      padding: "10px 14px",
-                      background: "#fff",
-                      color: "#334155",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                    }}
-                  >
-                    Track another
-                  </button>
-                </div>
-              </>
-            ) : (
-              <div style={{ minHeight: 150, display: "grid", placeItems: "center", textAlign: "center", color: "#94a3b8", padding: 16 }}>
-                <p style={{ margin: 0 }}>
-                  Enter a booking number and select <strong>Track booking</strong> to see trip status, route, and passenger details.
-                </p>
-              </div>
-            )}
-          </section>
+                  </div>
+                  <div className="track-booking-fields">
+                    {fields.map(([label, value]) => (
+                      <div className="track-booking-field" key={label}>
+                        <span>{label}</span>
+                        <strong>{value ?? "—"}</strong>
+                      </div>
+                    ))}
+                  </div>
+                  {booking.status == "PAYMENT_PENDING" && paymentMethod == "Bank Transfer" ? (
+                    <div class="bank-transfer-details">
+                      <h3>Bank Transfer Details</h3>
+
+                      <p>Bank: Bank of Ceylon</p>
+                      <p>Account Name: Tharusha Tours</p>
+                      <p>Account Number: 1234567890</p>
+                      <p>Branch: Colombo</p>
+                      <br />
+                      <p>Amount: {formatPrice(booking.advanceAmount)}</p>
+                      <p>Payment Reference: BOOKING-{booking.bookingID}</p>
+                      <br />
+                      <p class="notice">Please use the payment reference when making your transfer.</p>
+                    </div>
+                  ) : null}
+
+                  <div className="track-booking-actions"></div>
+                  <div className="button-row">
+                    <Button
+                      type="button"
+                      className="secondary-button"
+                      onClick={() => {
+                        setBooking(null);
+                        setBookingNumber("");
+                        setError("");
+                        prevStep();
+                      }}
+                    >
+                      Track Another
+                    </Button>
+                    {booking.status == "PAYMENT_PENDING" ? (
+                      <>
+                        {paymentMethod == "Card Payment" ? (
+                          <>
+                            <Button type="button" onClick={makePayment} disabled={loading}>
+                              {loading ? "Preparing payment..." : "Make Advance"}
+                            </Button>
+                          </>
+                        ) : (
+                          <>
+                            <Button type="button" onClick={markPayment} disabled={loading || paymentStatus == "PROCESSING"}>
+                              {loading ? "Sending..." : paymentStatus === "PROCESSING" ? "Payment Under Review" : "Mark Payment"}
+                            </Button>
+                          </>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <Button type="button" onClick={handleDone}>
+                          Done
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="track-booking-empty">
+                    <p>{loading ? "Loading booking details..." : "Your booking details will appear here."}</p>
+                  </div>
+                  <div className="button-row">
+                    <Button
+                      type="button"
+                      className="secondary-button"
+                      onClick={() => {
+                        setBooking(null);
+                        setBookingNumber("");
+                        setError("");
+                        prevStep();
+                      }}
+                    >
+                      Track Another
+                    </Button>
+
+                    <Button type="button" onClick={handleDone}>
+                      Done
+                    </Button>
+                  </div>
+                </>
+              )}
+            </section>
+          )}
         </div>
       </main>
 

@@ -2,6 +2,7 @@ package com.busfleetmanagement.system.controller;
 
 import com.busfleetmanagement.system.dto.BusAvailabilityRequest;
 import com.busfleetmanagement.system.entity.Bus;
+import com.busfleetmanagement.system.entity.Driver;
 import com.busfleetmanagement.system.service.AvailabilityService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,6 +66,45 @@ public class AvailabilityController {
                 );
 
         return ResponseEntity.ok(availableBuses);
+    }
+
+    @PostMapping("/drivers")
+    public ResponseEntity<List<Driver>> getAvailableDrivers(
+            @RequestBody BusAvailabilityRequest request) {
+
+        if (request == null) {
+            throw new IllegalArgumentException(
+                    "Availability request cannot be empty."
+            );
+        }
+
+        if (request.getStartDateTime() == null) {
+            throw new IllegalArgumentException(
+                    "Start date and time are required."
+            );
+        }
+
+        if (request.getEndDateTime() == null) {
+            throw new IllegalArgumentException(
+                    "End date and time are required."
+            );
+        }
+
+        if (!request.getStartDateTime()
+                .isBefore(request.getEndDateTime())) {
+
+            throw new IllegalArgumentException(
+                    "End date and time must be after start date and time."
+            );
+        }
+
+        List<Driver> availableDrivers =
+                availabilityService.getAvailableDrivers(
+                        request.getStartDateTime(),
+                        request.getEndDateTime()
+                );
+
+        return ResponseEntity.ok(availableDrivers);
     }
 
     // Handle invalid request data

@@ -11,9 +11,9 @@ Describe Owner;
 
 INSERT INTO Owner VALUES(1, "admin", 1234, "CCC", "1000202002");
 
-CREATE TABLE ExpenseLog(
-ExpenseID INT AUTO_INCREMENT PRIMARY KEY,
-Expensedate DATE NOT NULL,
+CREATE TABLE ExpenceLog(
+ExpenceID INT AUTO_INCREMENT PRIMARY KEY,
+Expencedate DATE NOT NULL,
 BRegistrationNo VARCHAR(20) NOT NULL,
 Category VARCHAR(20) NOT NULL,
 PaymentMethod VARCHAR(30) NOT NULL,
@@ -42,6 +42,8 @@ CONSTRAINT MT2 CHECK( Cost > 0 )
 DESCRIBE Journey;
 
 DROP TABLE Journey;
+
+DROP TABLE ExpenceLog;
 
 INSERT INTO Owner (Username, Password, Name, ContactNo) VALUES
 ('madmin', 'scrypt:32768:8:1$hash_placeholder', 'Main Admin', '0771234567'),

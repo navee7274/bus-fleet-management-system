@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5090/api",
+  baseURL: "https://api.tharushatours.com/api",
   headers: {
     "Content-Type": "application/json",
   },

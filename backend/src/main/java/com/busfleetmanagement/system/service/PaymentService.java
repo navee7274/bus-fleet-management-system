@@ -1,6 +1,8 @@
 package com.busfleetmanagement.system.service;
 
 import com.busfleetmanagement.system.entity.Payment;
+import com.busfleetmanagement.system.enums.PaymentStatus;
+import com.busfleetmanagement.system.exception.BadRequestException;
 import com.busfleetmanagement.system.repository.PaymentRepository;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,23 @@ public class PaymentService {
     // READ ONLY ONE PAYMENT RECORD
     public Optional<Payment> getPaymentRecordById(int PaymentID){
         return paymentRepository.findById(PaymentID);
+    }
+
+    public Optional<Payment> getPaymentRecordByBookingId(int BookingID){
+        return paymentRepository.findPaymentByBookingId(BookingID);
+    }
+
+    public Payment markPaymentDone(Payment payment) {
+
+        if(payment.getPaymentMethod() == "Card Payment" || payment.getPaymentStatus() != PaymentStatus.PENDING){
+            throw new BadRequestException(
+                    "Invalid request"
+            );
+        }
+
+        payment.setPaymentStatus(PaymentStatus.PROCESSING);
+
+        return paymentRepository.save(payment);
     }
 
     // UPDATE PAYMENT RECORD

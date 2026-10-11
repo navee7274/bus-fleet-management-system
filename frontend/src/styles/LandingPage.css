@@ -320,6 +320,8 @@ a {
 }
 
 .footer {
+  position: relative;
+  bottom: 0;
   margin-top: auto;
   padding: 55px 8% 20px;
   background: var(--navy);

@@ -2,6 +2,7 @@ package com.busfleetmanagement.system.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -35,15 +36,29 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/login").permitAll()
-                        .requestMatchers("/api/bookings/**").permitAll()
-                        .requestMatchers("/api/availability/**").permitAll()
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/availability/buses",
+                                "/api/availability/drivers",
+                                "/api/bookings"
+                        ).permitAll()
 
-                        // REMOVE IN PRODUCTION [START] !!!!!!!!!!!!!!
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/bookings/*",
+                                "/api/payments/*",
+                                "/api/payments/*/paymentmethod"
+                        ).permitAll()
 
-                        .requestMatchers("/api/**").permitAll()
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/payments/notify"
+                        ).permitAll()
 
-                        // REMOVE IN PRODUCTION [END] !!!!!!!!!!!!!!!!!!!
-
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/payments/*/mark"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
 

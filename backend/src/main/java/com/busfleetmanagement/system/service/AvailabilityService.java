@@ -45,12 +45,23 @@ public class  AvailabilityService {
     }
 
     // DRIVER AVAILABILITY--------------------------------------------
-    public boolean isDriverAvailable(Driver driver, LocalDateTime startDateTime, LocalDateTime endDateTime){
-        List<Booking> bookings = bookingRepository.findByDriverAndStartDateTimeLessThanAndEndDateTimeGreaterThan(
-                driver,
-                endDateTime,
-                startDateTime
-        );
+    public boolean isDriverAvailable(
+            Driver driver,
+            LocalDateTime startDateTime,
+            LocalDateTime endDateTime
+    ) {
+        // Reject inactive drivers
+        if (driver == null || !driver.isDActive()) {
+            return false;
+        }
+
+        List<Booking> bookings =
+                bookingRepository.findByDriverAndStartDateTimeLessThanAndEndDateTimeGreaterThan(
+                        driver,
+                        endDateTime,
+                        startDateTime
+                );
+
         return bookings.stream()
                 .noneMatch(booking ->
                         booking.getStatus() == BookingStatus.PENDING ||

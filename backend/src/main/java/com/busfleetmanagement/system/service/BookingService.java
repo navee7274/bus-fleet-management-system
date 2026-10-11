@@ -1,9 +1,6 @@
 package com.busfleetmanagement.system.service;
 
-import com.busfleetmanagement.system.entity.Booking;
-import com.busfleetmanagement.system.entity.Bus;
-import com.busfleetmanagement.system.entity.Driver;
-import com.busfleetmanagement.system.entity.Payment;
+import com.busfleetmanagement.system.entity.*;
 import com.busfleetmanagement.system.enums.BookingStatus;
 import com.busfleetmanagement.system.enums.PaymentStatus;
 import com.busfleetmanagement.system.exception.BadRequestException;
@@ -16,6 +13,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -28,24 +26,26 @@ public class BookingService {
     private DriverRepository driverRepository;
 
     private PaymentService paymentService;
+    private JourneyService journeyService;
 
 
-    public BookingService(BookingRepository bookingRepository, BusRepository busRepository, DriverRepository driverRepository, PaymentService paymentService){
+    public BookingService(BookingRepository bookingRepository, BusRepository busRepository, DriverRepository driverRepository, PaymentService paymentService, JourneyService journeyService){
         this.bookingRepository = bookingRepository;
         this.busRepository = busRepository;
         this.driverRepository = driverRepository;
         this.paymentService = paymentService;
+        this.journeyService = journeyService;
     }
 
     // VALIDATE PHONE NUMBER
-    private void validatePhoneNumber(String phone){
+    private void validatePhoneNumber(String phone) {
         if (phone == null || phone.isBlank()) {
-            throw new IllegalArgumentException("Phone number is required");
+            throw new BadRequestException("Phone number is required");
         }
 
-        if (!phone.matches("^(07\\d{8}|\\+947\\d{8})$")) {
-            throw new IllegalArgumentException(
-                    "Invalid Sri Lankan phone number. Use 07XXXXXXXX or +947XXXXXXXX"
+        if (!phone.matches("^0\\d{9}$")) {
+            throw new BadRequestException(
+                    "Invalid phone number. Use 0XXXXXXXXX (10 digits)"
             );
         }
     }
@@ -53,11 +53,11 @@ public class BookingService {
     // VALIDATE EMAIL ADDRESS
     private void validateEmail(String email) {
         if (email == null || email.isBlank()) {
-            throw new IllegalArgumentException("Email is required");
+            throw new BadRequestException("Email is required");
         }
 
         if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
-            throw new IllegalArgumentException("Invalid email address");
+            throw new BadRequestException("Invalid email address");
         }
     }
 
@@ -193,7 +193,8 @@ public class BookingService {
     }
 
     // APPROVE BOOKING
-    public Booking approveBooking(int BookingID, String paymentMethod){
+    public Booking approveBooking(int BookingID, String paymentMethod, String driverID, BigDecimal advanceAmount, BigDecimal finalPrice){
+
         Booking existingBooking = bookingRepository.findById(BookingID)
                 .orElseThrow(()-> new ResourceNotFoundException("Booking not found"));
 
@@ -202,6 +203,14 @@ public class BookingService {
                     "Booking cannot be approved in this state."
             );
         }
+
+        // GET DRIVER
+        Driver driver = driverRepository.findById(driverID)
+                .orElseThrow(()-> new ResourceNotFoundException("Driver not found"));
+
+        existingBooking.setDriver(driver);
+        existingBooking.setAdvanceAmount(advanceAmount);
+        existingBooking.setFinalPrice(finalPrice);
 
         if(existingBooking.getDriver() == null || existingBooking.getBus() == null){
             throw new BadRequestException(
@@ -262,9 +271,25 @@ public class BookingService {
     }
 
     // COMPLETE BOOKING
-    public Booking completeBooking(int BookingID){
+    public Booking completeBooking(int BookingID, BigDecimal startOdo, BigDecimal endOdo){
         Booking toCompleteBooking = bookingRepository.findById(BookingID)
                 .orElseThrow(()-> new ResourceNotFoundException("Booking not found"));
+
+        Driver journeyDriver = toCompleteBooking.getDriver();
+        Bus journeyBus = toCompleteBooking.getBus();
+        Journey journey = new Journey();
+        LocalDate now = LocalDate.now();
+
+        journey.setJourneyDate(now);
+        journey.setBus(journeyBus);
+        journey.setDriver(journeyDriver);
+        journey.setPurpose("Hire");
+        journey.setClientDestination(toCompleteBooking.getDestination());
+        journey.setStartOdometer(startOdo);
+        journey.setEndOdometer(endOdo);
+        journey.setIncomeAmount(toCompleteBooking.getFinalPrice());
+
+        journeyService.createJourney(journey);
 
         toCompleteBooking.setStatus(BookingStatus.COMPLETED);
 
