@@ -37,7 +37,7 @@ const bookingService = {
   },
 
   cancelBooking: async (id) => {
-    const response = await api.get(`/bookings/${id}/cancel`);
+    const response = await api.post(`/bookings/${id}/cancel`);
     return response.data;
   },
 

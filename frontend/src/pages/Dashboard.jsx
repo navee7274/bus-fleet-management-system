@@ -1,10 +1,63 @@
 import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
+import Button from "../components/Button";
+import Loading from "../components/Loading";
 import "../styles/Dashboard.css";
+import { useEffect, useState } from "react";
+import dashboardService from "../services/dashboardService";
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
   const { user } = useAuth();
+
+  const navigate = useNavigate();
+
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const loadDashboard = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const result = await dashboardService.getSummary();
+        console.log("Dashboard API response:", result);
+
+        setData(result);
+      } catch (error) {
+        console.error("Dashboard loading error:", error);
+        setError("Failed to load dashboard data.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDashboard();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="dashboard">
+        <Sidebar />
+
+        <div className="dashboard-main">
+          <Navbar />
+
+          <main className="dashboard-content">
+            <Loading message="Loading dashboard..." />
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return <p>{error}</p>;
+  }
+  console.log(data);
 
   return (
     <div className="dashboard">
@@ -32,12 +85,13 @@ function Dashboard() {
           </div>
 
           {/* Statistics */}
+
           <div className="stats-grid">
             <div className="stat-card">
               <div className="stat-icon">🚌</div>
               <div>
                 <span>Total Buses</span>
-                <h2>24</h2>
+                <h2>{data.totalBuses}</h2>
               </div>
             </div>
 
@@ -45,7 +99,7 @@ function Dashboard() {
               <div className="stat-icon">📋</div>
               <div>
                 <span>Active Bookings</span>
-                <h2>18</h2>
+                <h2>{data.activeBookings}</h2>
               </div>
             </div>
 
@@ -53,7 +107,7 @@ function Dashboard() {
               <div className="stat-icon">🛣️</div>
               <div>
                 <span>Today's Journeys</span>
-                <h2>12</h2>
+                <h2>{data.todaysJourneys}</h2>
               </div>
             </div>
 
@@ -61,7 +115,7 @@ function Dashboard() {
               <div className="stat-icon">💰</div>
               <div>
                 <span>Monthly Revenue</span>
-                <h2>Rs. 485,000</h2>
+                <h2>Rs. {Number(data.monthlyRevenue?.parsedValue ?? data.monthlyRevenue ?? 0).toLocaleString("en-LK")}</h2>
               </div>
             </div>
           </div>
@@ -76,7 +130,9 @@ function Dashboard() {
                   <p>Latest customer bookings</p>
                 </div>
 
-                <button className="view-button">View All</button>
+                <Button className="view-button" onClick={() => navigate("/bookings")}>
+                  View All
+                </Button>
               </div>
 
               <div className="table-container">
@@ -91,41 +147,20 @@ function Dashboard() {
                   </thead>
 
                   <tbody>
-                    <tr>
-                      <td>#BK-1024</td>
-                      <td>Kasun Perera</td>
-                      <td>Colombo → Kandy</td>
-                      <td>
-                        <span className="status confirmed">Confirmed</span>
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td>#BK-1023</td>
-                      <td>Nimal Silva</td>
-                      <td>Galle → Colombo</td>
-                      <td>
-                        <span className="status pending">Pending</span>
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td>#BK-1022</td>
-                      <td>Amal Fernando</td>
-                      <td>Matara → Galle</td>
-                      <td>
-                        <span className="status confirmed">Confirmed</span>
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td>#BK-1021</td>
-                      <td>Sahan Perera</td>
-                      <td>Colombo → Jaffna</td>
-                      <td>
-                        <span className="status cancelled">Cancelled</span>
-                      </td>
-                    </tr>
+                    {data.recentBookings.map((booking) => (
+                      <tr key={booking.bookingID}>
+                        <td>#{booking.bookingID}</td>
+                        <td>{booking.customerName}</td>
+                        <td>
+                          {booking.startLocation} → {booking.destination}
+                        </td>
+                        <td>
+                          <span className={`status status-${booking.status.toLowerCase().replaceAll("_", "-")}`}>
+                            {booking.status.replaceAll("_", " ")}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -144,34 +179,31 @@ function Dashboard() {
                 <div className="fleet-item">
                   <div className="fleet-label">
                     <span className="fleet-dot available"></span>
-                    Available
+                    Active Buses
                   </div>
-
-                  <strong>14</strong>
+                  <strong>{data.activeBuses}</strong>
                 </div>
 
                 <div className="fleet-item">
                   <div className="fleet-label">
                     <span className="fleet-dot active"></span>
-                    On Journey
+                    Active Drivers
                   </div>
-
-                  <strong>7</strong>
+                  <strong>{data.activeDrivers}</strong>
                 </div>
 
                 <div className="fleet-item">
                   <div className="fleet-label">
                     <span className="fleet-dot maintenance"></span>
-                    Maintenance
+                    Inactive Buses
                   </div>
-
-                  <strong>3</strong>
+                  <strong>{data.totalBuses - data.activeBuses}</strong>
                 </div>
               </div>
 
               <div className="fleet-total">
                 <span>Total Fleet</span>
-                <strong>24 Buses</strong>
+                <strong>{data.totalBuses} Buses</strong>
               </div>
             </section>
           </div>
@@ -179,81 +211,45 @@ function Dashboard() {
           {/* Bottom Grid */}
           <div className="dashboard-grid bottom-grid">
             {/* Today's Journeys */}
+
             <section className="dashboard-card">
               <div className="card-header">
                 <div>
-                  <h2>Today's Journeys</h2>
-                  <p>Upcoming scheduled journeys</p>
+                  <h2>Payment Overview</h2>
+                  <p>Current payment status</p>
                 </div>
               </div>
 
-              <div className="journey-list">
-                <div className="journey">
-                  <div className="journey-time">
-                    <strong>08:30</strong>
-                    <span>AM</span>
+              <div className="fleet-status">
+                <div className="fleet-item">
+                  <div className="fleet-label">
+                    <span className="fleet-dot available"></span>
+                    Successful
                   </div>
-
-                  <div className="journey-route">
-                    <strong>Colombo → Kandy</strong>
-                    <span>Bus WP-1234</span>
-                  </div>
-
-                  <span className="status confirmed">Active</span>
+                  <strong>{data.successfulPayments}</strong>
                 </div>
 
-                <div className="journey">
-                  <div className="journey-time">
-                    <strong>11:00</strong>
-                    <span>AM</span>
+                <div className="fleet-item">
+                  <div className="fleet-label">
+                    <span className="fleet-dot active"></span>
+                    Pending
                   </div>
-
-                  <div className="journey-route">
-                    <strong>Galle → Colombo</strong>
-                    <span>Bus SP-4567</span>
-                  </div>
-
-                  <span className="status pending">Upcoming</span>
+                  <strong>{data.pendingPayments}</strong>
                 </div>
 
-                <div className="journey">
-                  <div className="journey-time">
-                    <strong>02:30</strong>
-                    <span>PM</span>
+                <div className="fleet-item">
+                  <div className="fleet-label">
+                    <span className="fleet-dot maintenance"></span>
+                    Failed
                   </div>
-
-                  <div className="journey-route">
-                    <strong>Colombo → Jaffna</strong>
-                    <span>Bus NC-7890</span>
-                  </div>
-
-                  <span className="status pending">Upcoming</span>
-                </div>
-              </div>
-            </section>
-
-            {/* Maintenance */}
-            <section className="dashboard-card">
-              <div className="card-header">
-                <div>
-                  <h2>Maintenance</h2>
-                  <p>Buses requiring attention</p>
+                  <strong>{data.failedPayments}</strong>
                 </div>
               </div>
 
-              <div className="maintenance-summary">
-                <div className="maintenance-number">
-                  <strong>3</strong>
-                  <span>Buses in maintenance</span>
-                </div>
-
-                <div className="maintenance-number">
-                  <strong>2</strong>
-                  <span>Due this week</span>
-                </div>
+              <div className="fleet-total">
+                <span>Total Payments</span>
+                <strong>{data.totalPayments}</strong>
               </div>
-
-              <button className="maintenance-button">View Maintenance</button>
             </section>
           </div>
         </main>
