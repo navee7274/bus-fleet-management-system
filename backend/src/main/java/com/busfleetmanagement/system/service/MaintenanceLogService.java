@@ -3,6 +3,7 @@ package com.busfleetmanagement.system.service;
 import com.busfleetmanagement.system.dto.MaintenanceLogRequest;
 import com.busfleetmanagement.system.entity.Bus;
 import com.busfleetmanagement.system.entity.MaintenanceLog;
+import com.busfleetmanagement.system.exception.ResourceNotFoundException;
 import com.busfleetmanagement.system.repository.BusRepository;
 import com.busfleetmanagement.system.repository.MaintenanceLogRepository;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,10 @@ public class MaintenanceLogService {
                 .orElseThrow(() ->
                         new RuntimeException("Bus not found: "
                                 + request.getBusRegistrationNo()));
+
+        System.out.println("Maintenance cost: " + request.getCost());
+        System.out.println("Maintenance odometer: " + request.getOdometer());
+        System.out.println("Maintenance date: " + request.getMaintenanceDate());
 
         MaintenanceLog log = new MaintenanceLog();
 
@@ -74,7 +79,7 @@ public class MaintenanceLogService {
     public List<MaintenanceLog> getMaintenanceLogsByBus(String registrationNo) {
 
         if (!busRepository.existsById(registrationNo)) {
-            throw new RuntimeException("Bus not found: " + registrationNo);
+            throw new ResourceNotFoundException("Bus not found: " + registrationNo);
         }
 
         return maintenanceLogRepository
