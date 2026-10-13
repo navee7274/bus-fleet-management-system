@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -265,6 +266,27 @@ public class BookingService {
         Booking toConfirmBooking = bookingRepository.findById(BookingID)
                 .orElseThrow(()-> new ResourceNotFoundException("Booking not found"));
 
+        if(toConfirmBooking.getStatus() != BookingStatus.PAYMENT_PENDING){
+            throw new BadRequestException(
+                    "Booking cannot be confirmed in this state."
+            );
+        }
+
+        Payment payment = paymentService.getPaymentRecordByBookingId(toConfirmBooking.getBookingID())
+                .orElseThrow(()-> new ResourceNotFoundException("Booking does not have a payment record."));;
+
+        // Bank Transfers and cash are auto success when confirmed
+        if(!Objects.equals(payment.getPaymentMethod(), "Card Payment")){
+                payment.setPaymentStatus(PaymentStatus.SUCCESS);
+        }
+
+        if(payment.getPaymentStatus() != PaymentStatus.SUCCESS){
+                throw new BadRequestException(
+                        "Payment has not been completed successfully."
+                );
+        }
+
+        paymentService.updatePaymentRecord(payment.getPaymentID(), payment);
         toConfirmBooking.setStatus(BookingStatus.CONFIRMED);
 
         return bookingRepository.save(toConfirmBooking);
@@ -274,6 +296,12 @@ public class BookingService {
     public Booking completeBooking(int BookingID, BigDecimal startOdo, BigDecimal endOdo){
         Booking toCompleteBooking = bookingRepository.findById(BookingID)
                 .orElseThrow(()-> new ResourceNotFoundException("Booking not found"));
+
+        if(toCompleteBooking.getStatus() != BookingStatus.CONFIRMED){
+            throw new BadRequestException(
+                    "Booking cannot be completed in this state."
+            );
+        }
 
         Driver journeyDriver = toCompleteBooking.getDriver();
         Bus journeyBus = toCompleteBooking.getBus();
@@ -310,6 +338,14 @@ public class BookingService {
     public Booking cancelBooking(int BookingID){
         Booking toCancelBooking = bookingRepository.findById(BookingID)
                 .orElseThrow(()-> new ResourceNotFoundException("Booking not found"));
+
+        if(toCancelBooking.getStatus() != BookingStatus.PENDING
+                && toCancelBooking.getStatus() != BookingStatus.PAYMENT_PENDING
+                && toCancelBooking.getStatus() != BookingStatus.CONFIRMED){
+            throw new BadRequestException(
+                    "Booking cannot be cancelled in this state."
+            );
+        }
 
         toCancelBooking.setStatus(BookingStatus.CANCELLED);
 

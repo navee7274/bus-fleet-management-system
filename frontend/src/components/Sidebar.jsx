@@ -1,9 +1,12 @@
 import { NavLink } from "react-router-dom";
+import logo from "../assets/logo-white.svg";
 
 function Sidebar() {
   return (
     <aside className="sidebar">
-      <div className="sidebar-logo">Bus Fleet</div>
+      <div className="sidebar-logo">
+        <img src={logo} alt="Tharusha Tours logo" />
+      </div>
       <nav>
         <NavLink to="/dashboard">Dashboard</NavLink>
 
