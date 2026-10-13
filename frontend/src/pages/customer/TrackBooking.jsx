@@ -125,9 +125,10 @@ function TrackBooking() {
 
     try {
       await bookingService.markPaymentDone(booking.bookingID);
+
+      window.location.reload();
     } catch (err) {
       setError(err?.response?.data?.message || "Failed to mark payment.");
-    } finally {
       setLoading(false);
     }
   };
@@ -259,8 +260,9 @@ function TrackBooking() {
                   </div>
                   {booking.status == "PAYMENT_PENDING" && paymentMethod == "Bank Transfer" ? (
                     <div class="bank-transfer-details">
-                      <h3>Bank Transfer Details</h3>
-
+                      <h3>Bank Transfer Instructions</h3>
+                      <p>Transfer the advance payment to the bank account below. </p>
+                      <br />
                       <p>Bank: Bank of Ceylon</p>
                       <p>Account Name: Tharusha Tours</p>
                       <p>Account Number: 1234567890</p>
@@ -269,7 +271,11 @@ function TrackBooking() {
                       <p>Amount: {formatPrice(booking.advanceAmount)}</p>
                       <p>Payment Reference: BOOKING-{booking.bookingID}</p>
                       <br />
-                      <p class="notice">Please use the payment reference when making your transfer.</p>
+                      <p class="notice">Please include this payment reference when making your bank transfer to help us verify your payment.</p>
+                      <br />
+                      <p>
+                        Once you've completed the transfer, click <strong>Submit Payment Confirmation</strong> so we can verify your payment.
+                      </p>
                     </div>
                   ) : null}
 
@@ -292,13 +298,13 @@ function TrackBooking() {
                         {paymentMethod == "Card Payment" ? (
                           <>
                             <Button type="button" onClick={makePayment} disabled={loading}>
-                              {loading ? "Preparing payment..." : "Make Advance"}
+                              {loading ? "Preparing payment..." : "Pay Advance"}
                             </Button>
                           </>
                         ) : (
                           <>
                             <Button type="button" onClick={markPayment} disabled={loading || paymentStatus == "PROCESSING"}>
-                              {loading ? "Sending..." : paymentStatus === "PROCESSING" ? "Payment Under Review" : "Mark Payment"}
+                              {loading ? "Sending..." : paymentStatus === "PROCESSING" ? "Payment Under Review" : "Submit Payment Confirmation"}
                             </Button>
                           </>
                         )}
