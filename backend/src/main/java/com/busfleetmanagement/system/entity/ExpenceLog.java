@@ -13,6 +13,7 @@ import java.util.Date;
 public class ExpenceLog {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ExpenceID", nullable = false, unique = true, length = 10)
     private int expenceID;
 

@@ -29,7 +29,7 @@ public class FuelLog {
     @Column(name = "FCost", nullable = false, unique = false, length = 10)
     private BigDecimal fCost;
 
-    @Column(name = "FLitersfilled", nullable = false, unique = false, length = 3)
+    @Column(name = "FLitersfilled", insertable = false, updatable = false)
     private BigDecimal fLitersfilled;
 
     public FuelLog() {
@@ -51,33 +51,35 @@ public class FuelLog {
         this.bus = bus;
     }
 
-    public LocalDate getfDate() {
+    public LocalDate getFDate() {
         return fDate;
     }
 
-    public void setfDate(LocalDate fDate) {
+    public void setFDate(LocalDate fDate) {
         this.fDate = fDate;
     }
 
-    public BigDecimal getfPrice() {return fPrice;}
+    public BigDecimal getFPrice() {
+        return fPrice;
+    }
 
-    public void setfPrice(BigDecimal fPrice) {
+    public void setFPrice(BigDecimal fPrice) {
         this.fPrice = fPrice;
     }
 
-    public BigDecimal getfCost() {
+    public BigDecimal getFCost() {
         return fCost;
     }
 
-    public void setfCost(BigDecimal fCost) {
+    public void setFCost(BigDecimal fCost) {
         this.fCost = fCost;
     }
 
-    public BigDecimal getfLitersfilled() {
+    public BigDecimal getFLitersfilled() {
         return fLitersfilled;
     }
 
-    public void setfLitersfilled(BigDecimal fLitersfilled) {
+    public void setFLitersfilled(BigDecimal fLitersfilled) {
         this.fLitersfilled = fLitersfilled;
     }
 }
