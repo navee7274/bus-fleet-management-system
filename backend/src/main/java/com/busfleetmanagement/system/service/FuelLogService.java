@@ -2,6 +2,7 @@ package com.busfleetmanagement.system.service;
 
 import com.busfleetmanagement.system.entity.Bus;
 import com.busfleetmanagement.system.entity.FuelLog;
+import com.busfleetmanagement.system.exception.BadRequestException;
 import com.busfleetmanagement.system.repository.BusRepository;
 import com.busfleetmanagement.system.repository.FuelLogRepository;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ public class FuelLogService {
     // Get fuel log by ID
     public FuelLog getFuelLogById(int fuelLogID) {
         return fuelLogRepository.findById(fuelLogID).orElseThrow(() ->
-                        new RuntimeException("Fuel log not found with ID: " + fuelLogID));
+                        new BadRequestException("Fuel log not found with ID: " + fuelLogID));
     }
 
     // Create a new fuel log
@@ -42,30 +43,29 @@ public class FuelLogService {
                 fuelLog.getBus().getBusRegistrationNo() == null ||
                 fuelLog.getBus().getBusRegistrationNo().isEmpty()) {
 
-            throw new RuntimeException("Bus is required");
+            throw new BadRequestException("Bus is required");
         }
 
         // Find bus
         Bus bus = busRepository.findById(fuelLog.getBus().getBusRegistrationNo()).orElseThrow(() ->
-                        new RuntimeException("Bus not found"));
+                        new BadRequestException("Bus not found"));
 
         // Validate fuel price
-        if (fuelLog.getfPrice() == null || fuelLog.getfPrice().compareTo(BigDecimal.ZERO) <= 0) {
+        if (fuelLog.getFPrice() == null || fuelLog.getFPrice().compareTo(BigDecimal.ZERO) <= 0) {
 
-            throw new RuntimeException("Fuel price must be greater than zero");
+            throw new BadRequestException("Fuel price must be greater than zero");
         }
 
         // Validate liters
-        if (fuelLog.getfLitersfilled() == null ||
-                fuelLog.getfLitersfilled().compareTo(BigDecimal.ZERO) <= 0) {
+        if (fuelLog.getFLitersfilled() == null ||
+                fuelLog.getFLitersfilled().compareTo(BigDecimal.ZERO) <= 0) {
 
-            throw new RuntimeException("Fuel liters must be greater than zero");
+            throw new BadRequestException("Fuel liters must be greater than zero");
         }
 
         // Calculate fuel cost
-        BigDecimal fuelCost = fuelLog.getfPrice().multiply(fuelLog.getfLitersfilled());
 
-        fuelLog.setfCost(fuelCost);
+        fuelLog.setFCost(fuelLog.getFCost());
 
         // Set managed bus entity
         fuelLog.setBus(bus);
@@ -92,26 +92,22 @@ public class FuelLogService {
                         new RuntimeException("Bus not found"));
 
         // Validate fuel price
-        if (fuelLog.getfPrice() == null || fuelLog.getfPrice().compareTo(BigDecimal.ZERO) <= 0) {
+        if (fuelLog.getFPrice() == null || fuelLog.getFPrice().compareTo(BigDecimal.ZERO) <= 0) {
 
             throw new RuntimeException("Fuel price must be greater than zero");
         }
 
         // Validate liters
-        if (fuelLog.getfLitersfilled() == null || fuelLog.getfLitersfilled().compareTo(BigDecimal.ZERO) <= 0) {
+        if (fuelLog.getFLitersfilled() == null || fuelLog.getFLitersfilled().compareTo(BigDecimal.ZERO) <= 0) {
 
             throw new RuntimeException("Fuel liters must be greater than zero");
         }
 
-        // Calculate fuel cost
-        BigDecimal fuelCost = fuelLog.getfPrice().multiply(fuelLog.getfLitersfilled());
-
         // Update fields
         existingFuelLog.setBus(bus);
-        existingFuelLog.setfDate(fuelLog.getfDate());
-        existingFuelLog.setfPrice(fuelLog.getfPrice());
-        existingFuelLog.setfLitersfilled(fuelLog.getfLitersfilled());
-        existingFuelLog.setfCost(fuelCost);
+        existingFuelLog.setFDate(fuelLog.getFDate());
+        existingFuelLog.setFPrice(fuelLog.getFPrice());
+        existingFuelLog.setFCost(fuelLog.getFCost());
 
         return fuelLogRepository.save(existingFuelLog);
     }
