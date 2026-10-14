@@ -70,4 +70,29 @@ public class AuthController {
                 )
         );
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("SESSION_ID".equals(cookie.getName())) {
+                    authService.logout(cookie.getValue());
+                    break;
+                }
+            }
+        }
+
+        Cookie cookie = new Cookie("SESSION_ID", "");
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+
+        return ResponseEntity.noContent().build();
+    }
 }

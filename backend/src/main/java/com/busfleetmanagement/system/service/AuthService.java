@@ -49,4 +49,8 @@ public class AuthService {
                 sessionId
         );
     }
+
+    public void logout(String sessionId) {
+        sessionManager.removeSession(sessionId);
+    }
 }
