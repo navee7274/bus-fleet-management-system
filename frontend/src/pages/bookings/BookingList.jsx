@@ -59,8 +59,6 @@ function BookingList() {
           <h1>Booking Management</h1>
           <p>Manage your journey bookings</p>
         </div>
-
-        <Button onClick={() => navigate("/bookings/add")}>+ Add Booking</Button>
       </div>
 
       {/* Error */}

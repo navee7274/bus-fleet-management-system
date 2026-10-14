@@ -18,6 +18,7 @@ function TrackBooking() {
   const [paymentStatus, setPaymentStatus] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const trackBooking = async (e) => {
     e.preventDefault();
@@ -77,7 +78,8 @@ function TrackBooking() {
 
       // Payment completed doesn't necessarily mean success.
       window.payhere.onCompleted = (orderId) => {
-        setError(`Payment submitted for ${orderId}. ` + "Please check your booking status shortly.");
+        setError("");
+        setSuccess(`Payment submitted successfully (Order: ${orderId}). Your booking status will update once payment is verified.`);
       };
 
       window.payhere.onDismissed = () => {
@@ -126,7 +128,8 @@ function TrackBooking() {
     try {
       await bookingService.markPaymentDone(booking.bookingID);
 
-      window.location.reload();
+      setSuccess("Your payment confirmation has been submitted. Our team will verify your bank transfer.");
+      setPaymentStatus("PROCESSING");
     } catch (err) {
       setError(err?.response?.data?.message || "Failed to mark payment.");
       setLoading(false);
@@ -198,6 +201,13 @@ function TrackBooking() {
         {error && (
           <div className="booking-error" role="alert">
             {error}
+          </div>
+        )}
+
+        {success && (
+          <div className="booking-success" role="status">
+            <strong>✓ Success!</strong>
+            <p>{success}</p>
           </div>
         )}
 
