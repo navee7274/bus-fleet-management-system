@@ -12,6 +12,27 @@
   margin-bottom: 20px;
 }
 
+.booking-success {
+  background-color: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-left: 4px solid #10b981;
+  color: #065f46;
+  padding: 14px 18px;
+  margin: 16px 0;
+  border-radius: 8px;
+}
+
+.booking-success strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 15px;
+}
+
+.booking-success p {
+  margin: 0;
+  line-height: 1.5;
+}
+
 .booking-header {
   margin-bottom: 20px !important;
   display: flex;
