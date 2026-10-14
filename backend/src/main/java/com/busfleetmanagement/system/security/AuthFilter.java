@@ -36,6 +36,12 @@ public class AuthFilter extends OncePerRequestFilter {
             return;
         }
 
+        if (requestURI.equals("/api/auth/logout")
+                && "POST".equalsIgnoreCase(request.getMethod())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         boolean publicPost =
                 "POST".equalsIgnoreCase(request.getMethod())
                         && (
